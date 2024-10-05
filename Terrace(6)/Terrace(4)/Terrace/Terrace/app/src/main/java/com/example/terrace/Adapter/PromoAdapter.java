@@ -1,7 +1,6 @@
 package com.example.terrace.Adapter;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,73 +11,83 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.example.terrace.Interface.icCartClick;
+
+import com.example.terrace.Interface.icPromoClick;
+import com.example.terrace.Interface.icUsePromoClick;
 import com.example.terrace.R;
-import com.example.terrace.model.Drinks;
-import com.example.terrace.model.cart;
+import com.example.terrace.model.Promotion;
+import android.text.format.DateFormat; // Thêm import này
+import java.text.SimpleDateFormat; // Thêm import này
+import java.util.Date;
 
 import java.util.ArrayList;
 
-public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>  {
+public class PromoAdapter extends RecyclerView.Adapter<PromoAdapter.ViewHolder>  {
     //khai bao bien
     Activity context;
-    ArrayList<cart> arr_Cart;
-    icCartClick icCartClickm;
-
-    public CartAdapter(Activity context, ArrayList<cart> arr_Cart,icCartClick icCartClickm){
+    ArrayList<Promotion> arrPromo;
+    icPromoClick icPromoClickm;
+    icUsePromoClick icUsePromoClickm;
+    public PromoAdapter(Activity context, ArrayList<Promotion> arrPromo, icPromoClick icPromoClickm, icUsePromoClick icUsePromoClickm){
         this.context=context;
-        this.arr_Cart = arr_Cart;
-        this.icCartClickm = icCartClickm;
+        this.arrPromo = arrPromo;
+        this.icPromoClickm = icPromoClickm;
+        this.icUsePromoClickm = icUsePromoClickm;
     }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater= LayoutInflater.from(context);
-        View viewSanPham=layoutInflater.inflate(R.layout.cart_item,parent, false);
+        View viewSanPham=layoutInflater.inflate(R.layout.promo_items,parent, false);
         ViewHolder viewHolderSP=new ViewHolder(viewSanPham);
         return  viewHolderSP;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        cart sp= arr_Cart.get(position);
+        Promotion sp= arrPromo.get(position);
 
-        Glide.with(context)
-                .load(sp.getImage())
-                .into(holder.imgProduct);
-        holder.txtProductName.setText(sp.getName());
 
-        holder.txtProductPrice.setText(String.valueOf(sp.getPrice()));
+        holder.tvName.setText(sp.getName());
 
-        holder.btnRemoveProduct.setOnClickListener(new View.OnClickListener() {
+        holder.tvDiscount.setText(String.valueOf(sp.getDiscount()));
+
+        holder.btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                icCartClickm.onCartClick(sp);
+                icPromoClickm.onClick(sp);
             }
         });
-        holder.tvQuantity.setText(String.valueOf(sp.getQuantity()));
-
-
+        holder.btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                icUsePromoClickm.onClick(sp);
+            }
+        });
+        Date endDate = sp.getEnd().toDate();
+        // Định dạng ngày
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String formattedEndDate = dateFormat.format(endDate);
+        holder.tvEndDay.setText(formattedEndDate);
     }
 
     @Override
     public int getItemCount() {
-        return arr_Cart.size();
+        return arrPromo.size();
     }
 
     public class  ViewHolder extends RecyclerView.ViewHolder{
-        ImageView imgProduct;
-        TextView txtProductName, txtProductPrice, tvQuantity;
-        ImageButton btnRemoveProduct;
+
+        TextView tvName, tvDiscount, tvEndDay;
+        ImageButton btnRemove, btnUse;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgProduct=itemView.findViewById(R.id.imgProduct);
-            txtProductName = itemView.findViewById(R.id.txtProductName);
-            txtProductPrice=itemView.findViewById(R.id.txtProductPrice);
-            btnRemoveProduct=itemView.findViewById(R.id.btnRemoveProduct);
-            tvQuantity=itemView.findViewById(R.id.tvQuantity);
+            tvName = itemView.findViewById(R.id.tvPromoName);
+            tvDiscount=itemView.findViewById(R.id.tvDiscount);
+            btnRemove=itemView.findViewById(R.id.btnRemove);
+            btnRemove=itemView.findViewById(R.id.btnUsePromo);
+            tvEndDay=itemView.findViewById(R.id.tvEndDay);
         }
     }
 }

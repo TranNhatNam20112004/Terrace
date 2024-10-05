@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
@@ -16,12 +17,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.terrace.Adapter.ProductAdapter;
 import com.example.terrace.databinding.ActivityAdminPageBinding;
+import com.example.terrace.model.Drinks;
 import com.example.terrace.model.Product;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -29,10 +32,11 @@ import java.util.ArrayList;
 public class AdminPageActivity extends AppCompatActivity implements ProductAdapter.ProductOnClickListener {
     private ActivityAdminPageBinding binding;
     //firebase auth
-    private ArrayList<Product> arr_Product;
+    private ArrayList<Drinks> arr_Drinks;
     private ProductAdapter adapterProduct;
     private RecyclerView recyclerViewSP;
     private FirebaseFirestore db;
+    Button btnPromo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,10 +58,18 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
             }
         });
         addControls();
+
+        btnPromo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i  = new Intent(AdminPageActivity.this, PromoActivity.class);
+                startActivity(i);
+            }
+        });
     }
     private void filter(String text) {
-        ArrayList<Product> filteredList = new ArrayList<>();
-        for (Product item : arr_Product) {
+        ArrayList<Drinks> filteredList = new ArrayList<>();
+        for (Drinks item : arr_Drinks) {
             if (item.getName().toLowerCase().contains(text.toLowerCase())) {
                 filteredList.add(item);
             }
@@ -68,30 +80,34 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
         recyclerViewSP = findViewById(R.id.rvSP);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         recyclerViewSP.setLayoutManager(gridLayoutManager);
-
+        btnPromo =findViewById(R.id.btnPromo);
         db = FirebaseFirestore.getInstance();
-        arr_Product = new ArrayList<Product>();
+        arr_Drinks = new ArrayList<>();
 
-        loadServices();
-        adapterProduct = new ProductAdapter(this, arr_Product, this);
+        loadData();
+        adapterProduct = new ProductAdapter(this, arr_Drinks, this);
         recyclerViewSP.setAdapter(adapterProduct);
 
     }
-    private void loadServices() {
-        db.collection("drinks").orderBy("name", Query.Direction.ASCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Log.d("Error", error.getMessage());
-                        } else {
-                            for (DocumentChange dc : value.getDocumentChanges()) {
-                                arr_Product.add(dc.getDocument().toObject(Product.class));
-                            }
-                            adapterProduct.notifyDataSetChanged();
-                        }
-
+    private void loadData() {
+        // Listen for real-time updates in the 'drinks' collection
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("drinks")
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.w("Firestore", "Listen failed.", error);
+                        return;
                     }
+                    // Clear the list to avoid duplicates
+                    arr_Drinks.clear();
+                    // Duyệt qua từng tài liệu (product) trong collection "drinks"
+                    for (QueryDocumentSnapshot document : snapshots) {
+                        // Chuyển đổi tài liệu thành đối tượng Drinks
+                        Drinks drinks = document.toObject(Drinks.class);
+                        arr_Drinks.add(drinks);
+                    }
+                    // Notify adapter that data has changed
+                    adapterProduct.notifyDataSetChanged();
                 });
     }
 

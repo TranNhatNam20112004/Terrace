@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Drinks implements Serializable {
     private String name,image,detail;
-    private float price;
+    private float price, originalPrice;
 
     public Drinks() {
     }
@@ -14,6 +14,22 @@ public class Drinks implements Serializable {
         this.image = image;
         this.detail = detail;
         this.price = price;
+    }
+
+    public Drinks(String name, String image, String detail, float price, float originalPrice) {
+        this.name = name;
+        this.image = image;
+        this.detail = detail;
+        this.price = price;
+        this.originalPrice = originalPrice;
+    }
+
+    public float getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(float originalPrice) {
+        this.originalPrice = originalPrice;
     }
 
     public String getName() {

@@ -50,7 +50,7 @@ public class AddProductActivity extends AppCompatActivity {
             }
         });
         //xu ly nhap chuot , bat dau up phan loai
-        binding.btnThem.setOnClickListener(new View.OnClickListener() {
+        binding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addCategoryFirebase();

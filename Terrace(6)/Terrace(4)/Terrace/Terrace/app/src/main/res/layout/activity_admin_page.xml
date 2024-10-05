@@ -50,18 +50,30 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/productitems" />
 
-    <Button
-        android:id="@+id/btnThemSP"
-        android:layout_width="200dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="80dp"
-        android:layout_marginEnd="80dp"
-        android:layout_marginBottom="25dp"
-        android:backgroundTint="@color/color1"
-        android:text="Thêm sản phẩm"
-        android:textSize="25dp" />
+        android:layout_alignBottom="@+id/rvSP"
+        android:layout_marginBottom="-6dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnThemSP"
+            android:layout_width="wrap_content"
+            android:layout_height="69dp"
+            android:layout_marginLeft="15dp"
+            android:backgroundTint="@color/color1"
+            android:text="Thêm sản phẩm"
+            android:textSize="20dp" />
+
+        <Button
+            android:id="@+id/btnPromo"
+            android:layout_width="187dp"
+            android:layout_height="69dp"
+
+            android:backgroundTint="@color/color1"
+            android:text="Khuyến mãi"
+            android:textSize="20dp" />
+    </LinearLayout>
+
 </RelativeLayout>

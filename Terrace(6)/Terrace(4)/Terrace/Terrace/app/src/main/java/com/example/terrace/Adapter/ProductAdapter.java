@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.terrace.R;
+import com.example.terrace.model.Drinks;
 import com.example.terrace.model.Product;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
@@ -18,12 +19,12 @@ import java.util.ArrayList;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder>{
     private Context context;
-    private ArrayList<Product> arr_Product;
+    private ArrayList<Drinks> arr_Product;
     ProductOnClickListener productOnClickListener;
 
     FirebaseFirestore db;
 
-    public ProductAdapter(Context context, ArrayList<Product> arr_Product, ProductOnClickListener productOnClickListener){
+    public ProductAdapter(Context context, ArrayList<Drinks> arr_Product, ProductOnClickListener productOnClickListener){
         this.context = context;
         this.arr_Product = arr_Product;
         this.productOnClickListener = productOnClickListener;
@@ -41,8 +42,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         db = FirebaseFirestore.getInstance();
-        Product sp =  arr_Product.get(position);
-        String ma = sp.getMaSP();
+        Drinks sp =  arr_Product.get(position);
+
         Picasso.get().load(sp.getImage()).into(holder.ivHinhSP);
         String g = String.valueOf(sp.getPrice());
         holder.txtGiaSP.setText(g);
@@ -64,7 +65,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             txtGiaSP = itemView.findViewById(R.id.txtGiaSP);
         }
     }
-    public void filterList(ArrayList<Product> filteredList) {
+    public void filterList(ArrayList<Drinks> filteredList) {
         this.arr_Product = filteredList;
         notifyDataSetChanged();
     }
