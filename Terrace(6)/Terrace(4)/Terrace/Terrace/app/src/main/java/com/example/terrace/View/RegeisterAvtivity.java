@@ -1,10 +1,10 @@
 package com.example.terrace.View;
 
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -15,13 +15,19 @@ import androidx.cardview.widget.CardView;
 
 import com.example.terrace.model.User;
 import com.example.terrace.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class RegeisterAvtivity extends AppCompatActivity {
     CardView cardLog;
-    ImageButton btnRes, btnBack;
-    EditText edtEmail, edtPass,edtAccount, edtPhone;
-    String account, pass, email,phone;
+    Button btnRes;
+    ImageButton btnBack;
+    EditText edtEmail, edtPass, edtAccount, edtPhone;
+    String account, pass, email, phone;
+
+    private FirebaseAuth auth; // Khai báo FirebaseAuth
+    private FirebaseFirestore db; // Khai báo Firestore
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +35,17 @@ public class RegeisterAvtivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
 
-        btnBack =  findViewById(R.id.btnBack);
-        edtEmail =  findViewById(R.id.edtEmail);
-        edtPass =  findViewById(R.id.edtPass);
-        edtAccount =  findViewById(R.id.edtAccount);
-        edtPhone =  findViewById(R.id.edtPhone);
+        // Khởi tạo FirebaseAuth và Firestore
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-        cardLog =  findViewById(R.id.cardLog);
+        btnBack = findViewById(R.id.btnBack);
+        edtEmail = findViewById(R.id.edtEmail);
+        edtPass = findViewById(R.id.edtPass);
+        edtAccount = findViewById(R.id.edtAccount);
+        edtPhone = findViewById(R.id.edtPhone);
+
+        cardLog = findViewById(R.id.cardLog);
         cardLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -43,11 +53,12 @@ public class RegeisterAvtivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-        btnRes =  findViewById(R.id.btnRegister);
+
+        btnRes = findViewById(R.id.btnRegister);
         btnRes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    Register();
+                Register();
             }
         });
 
@@ -59,39 +70,50 @@ public class RegeisterAvtivity extends AppCompatActivity {
         });
     }
 
-    private void Register(){
+    private void Register() {
         email = edtEmail.getText().toString();
         account = edtAccount.getText().toString();
         pass = edtPass.getText().toString();
         phone = edtPhone.getText().toString();
-        String role ="custumer";
+
+        // Kiểm tra các trường
         if (email.isEmpty() || account.isEmpty() || pass.isEmpty() || phone.isEmpty()) {
             Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        User user = new User(account,pass,email,role,phone);
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("user")
-                .add(user)
+        // Tạo tài khoản trên Firebase Authentication
+        auth.createUserWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(task -> {
-
-                    if (task.isSuccessful()){
-                        Toast.makeText(this, "Register sussessfull", Toast.LENGTH_SHORT).show();
-                        Intent i = new Intent(RegeisterAvtivity.this, MainActivity.class);
-                        i.putExtra("name",account);
-                        startActivity(i);
-
-                    }
-                    else{
-                        Toast.makeText(this, " Register fail", Toast.LENGTH_SHORT).show();
+                    if (task.isSuccessful()) {
+                        // Nếu tạo tài khoản thành công, lưu thông tin vào Firestore
+                        User user = new User(account, pass, email, "customer", phone);
+                        saveUserToFirestore(user);
+                    } else {
+                        Toast.makeText(this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        });
+                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
+    private void saveUserToFirestore(User user) {
+        db.collection("user")
+                .add(user)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Register successful", Toast.LENGTH_SHORT).show();
+                        Intent i = new Intent(RegeisterAvtivity.this, MainActivity.class);
+                        i.putExtra("name", user.getAccount());
+                        startActivity(i);
+                        finish();
+                    } else {
+                        Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error saving data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
 }

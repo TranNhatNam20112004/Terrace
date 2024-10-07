@@ -3,7 +3,7 @@ package com.example.terrace.model;
 import java.io.Serializable;
 
 public class Drinks implements Serializable {
-    private String name,image,detail;
+    private String name, image, detail;
     private float price, originalPrice;
 
     public Drinks() {

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +33,13 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerViewSP;
     SanPhamAdapter sanPhamAdapter;
-    ArrayList<Drinks> arr_Drinks;
+    ArrayList<Drinks> arr_Drinks; // Danh sách sản phẩm hiện tại
+    ArrayList<Drinks> arr_DrinksFull; // Danh sách sản phẩm đầy đủ
     ImageButton btnLogout, btnCart;
-
     TextView txtName;
+    SearchView searchView; // Khai báo SearchView
+    float totalPrice = 0; // Giá trị tổng cho giỏ hàng
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,35 +75,48 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
-        //su kien logout
+        // Sự kiện logout
         btnLogout = findViewById(R.id.btnLogout);
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(i);
-            }
+        btnLogout.setOnClickListener(view -> {
+            Intent i = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(i);
         });
 
-        //Gan username
+        // Gán username
         txtName = findViewById(R.id.txtName);
         Intent i = getIntent();
-        name = i.getStringExtra("name");
-        txtName.setText(name.toString());
+        String name = i.getStringExtra("name");
+        txtName.setText(name);
 
+        // Gán sự kiện cho giỏ hàng
         btnCart = findViewById(R.id.btnCart);
-        btnCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, ActivityCart.class);
-                i.putExtra("total",totalPrice);
-                startActivity(i);
-            }
+        btnCart.setOnClickListener(v -> {
+            Intent i1 = new Intent(MainActivity.this, ActivityCart.class);
+            i1.putExtra("total", totalPrice);
+            startActivity(i1);
         });
 
+        // Gán sự kiện cho SearchView
+        searchView = findViewById(R.id.Search);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.isEmpty()) {
+                    // Khi xóa tìm kiếm, cập nhật lại danh sách sản phẩm từ arr_DrinksFull
+                    sanPhamAdapter.updateList(arr_DrinksFull);
+                } else {
+                    filter(newText); // Gọi hàm lọc khi người dùng nhập
+                }
+                return true;
+            }
+        });
     }
-    String name;
+
     private void loadData() {
         // Listen for real-time updates in the 'drinks' collection
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -119,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
                         Drinks drinks = document.toObject(Drinks.class);
                         arr_Drinks.add(drinks);
                     }
+                    // Cập nhật danh sách đầy đủ
+                    arr_DrinksFull.clear();
+                    arr_DrinksFull.addAll(arr_Drinks);
 
                     // Notify adapter that data has changed
                     sanPhamAdapter.notifyDataSetChanged();
@@ -126,23 +146,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addControls() {
-        recyclerViewSP=findViewById(R.id.recyclerSanPham);
-        arr_Drinks =new ArrayList<>();
-        sanPhamAdapter=new SanPhamAdapter(this, arr_Drinks, new icDrinkClick() {
-            @Override
-            public void onDrinkClick(Drinks drinks) {
-                AddProduct(drinks);
-            }
+        recyclerViewSP = findViewById(R.id.recyclerSanPham);
+        arr_Drinks = new ArrayList<>();
+        arr_DrinksFull = new ArrayList<>(); // Khởi tạo danh sách đầy đủ
+        sanPhamAdapter = new SanPhamAdapter(this, arr_Drinks, drinks -> {
+            AddProduct(drinks);
         });
         recyclerViewSP.setAdapter(sanPhamAdapter);
-        StaggeredGridLayoutManager staggeredGridLayoutManager=
-                new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager staggeredGridLayoutManager =
+                new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         recyclerViewSP.setLayoutManager(staggeredGridLayoutManager);
     }
-    float totalPrice = 0;
+
     private void AddProduct(Drinks drinks) {
         // Tạo một đối tượng Cart từ sản phẩm Drinks
-        cart cartItem = new cart(drinks.getName(), drinks.getImage(),name, drinks.getPrice(), 1.0f);
+        cart cartItem = new cart(drinks.getName(), drinks.getImage(), txtName.getText().toString(), drinks.getPrice(), 1.0f);
 
         // Thêm sản phẩm vào Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -155,5 +173,22 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(MainActivity.this, "Thêm sản phẩm vào giỏ hàng thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    // Hàm lọc sản phẩm theo tên
+    private void filter(String text) {
+        ArrayList<Drinks> filteredDrinks = new ArrayList<>(); // Danh sách đã lọc
+
+        for (Drinks item : arr_DrinksFull) { // Thay đổi từ arr_Drinks sang arr_DrinksFull
+            if (item.getName().toLowerCase().contains(text.toLowerCase())) {
+                filteredDrinks.add(item);
+            }
+        }
+
+        // Cập nhật adapter với danh sách đã lọc
+        sanPhamAdapter.updateList(filteredDrinks);
+        if (filteredDrinks.isEmpty()) {
+            Toast.makeText(MainActivity.this, "Không tìm thấy sản phẩm nào", Toast.LENGTH_SHORT).show();
+        }
     }
 }

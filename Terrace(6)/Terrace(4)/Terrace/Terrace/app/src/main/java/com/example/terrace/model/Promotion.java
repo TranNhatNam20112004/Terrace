@@ -1,11 +1,13 @@
 package com.example.terrace.model;
+
 import com.google.firebase.Timestamp;
 
 public class Promotion {
+    private String id; // Thêm thuộc tính ID
     private String name;
     private int discount;
-    private Timestamp start; // Thay đổi thành Timestamp
-    private Timestamp end;   // Thay đổi thành Timestamp
+    private Timestamp start;
+    private Timestamp end;
     private int quantity;
 
     public Promotion() {
@@ -18,7 +20,8 @@ public class Promotion {
         this.end = end;
         this.quantity = quantity;
     }
-    public Promotion(String name, int discount,Timestamp start, Timestamp end, int quantity) {
+
+    public Promotion(String name, int discount, Timestamp start, Timestamp end, int quantity) {
         this.name = name;
         this.discount = discount;
         this.end = end;
@@ -26,8 +29,15 @@ public class Promotion {
         this.start = start;
     }
 
-
     // Getters và setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }

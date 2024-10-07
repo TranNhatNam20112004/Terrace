@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -12,8 +13,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-
-import com.example.terrace.AdminActivity;
 import com.example.terrace.AdminPageActivity;
 import com.example.terrace.R;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -21,8 +20,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
     CardView btnRes;
-    ImageButton btnLog, btnBack;
+    Button btnLog, btnForgot;
+    ImageButton btnBack;
     EditText edtEmail, edtPass;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,19 +31,33 @@ public class LoginActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
-        btnBack =  findViewById(R.id.btnBack);
-        edtEmail =  findViewById(R.id.edtEmail);
-        edtPass =  findViewById(R.id.edtPass);
+        // Find views
+        btnBack = findViewById(R.id.btnBack);
+        edtEmail = findViewById(R.id.edtEmail);
+        edtPass = findViewById(R.id.edtPass);
+        btnForgot = findViewById(R.id.btnForgot); // Nút Forgot Password
 
-        btnRes =  findViewById(R.id.cardRes);
+        // Sự kiện cho nút Forgot Password
+        btnForgot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
+                startActivity(intent); // Chuyển qua ForgetPasswordActivity
+            }
+        });
+
+        // Sự kiện cho nút Sign Up
+        btnRes = findViewById(R.id.cardRes);
         btnRes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(LoginActivity.this,RegeisterAvtivity.class);
+                Intent i = new Intent(LoginActivity.this, RegeisterAvtivity.class);
                 startActivity(i);
             }
         });
-        btnLog =  findViewById(R.id.btnLogin);
+
+        // Sự kiện cho nút Login
+        btnLog = findViewById(R.id.btnLogin);
         btnLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -50,11 +65,12 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // Sự kiện cho nút Back
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Intent i = new Intent(LoginActivity.this, Introduce.class);
-               startActivity(i);
+                Intent i = new Intent(LoginActivity.this, Introduce.class);
+                startActivity(i);
             }
         });
     }
@@ -79,34 +95,26 @@ public class LoginActivity extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        // User found, get the role
-                        for (DocumentSnapshot document : task.getResult()) {
-                            String role = document.getString("role");
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                        String role = document.getString("role"); // Lấy vai trò người dùng
 
-                            if (role != null && role.equals("admin")) {
-                                // If the user is an admin
-                                Toast.makeText(this, "Welcome Admin", Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(LoginActivity.this, AdminPageActivity.class); // Assuming you have an AdminActivity
-                                startActivity(i);
-                            } else {
-                                // If the user is not an admin
-                                Toast.makeText(this, "Welcome "+document.getString("account"), Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                i.putExtra("name",document.getString("account"));// Regular user activity
-                                startActivity(i);
-                            }
+                        // Chuyển hướng đến MainActivity hoặc AdminPageActivity dựa trên vai trò
+                        if ("customer".equals(role)) {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtra("name", document.getString("account"));
+                            startActivity(intent);
+                            finish();
+                        } else if ("admin".equals(role)) {
+                            Intent intent = new Intent(LoginActivity.this, AdminPageActivity.class);
+                            startActivity(intent);
                             finish();
                         }
                     } else {
-                        // Invalid email or password
-                        Toast.makeText(this, "Wrong email or password", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error connecting to database", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Error fetching data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
-
-
 }
