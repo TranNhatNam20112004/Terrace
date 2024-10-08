@@ -5,70 +5,64 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.terrace.Interface.icPromoClick;
 import com.example.terrace.Interface.icUsePromoClick;
 import com.example.terrace.R;
 import com.example.terrace.model.Promotion;
-import android.text.format.DateFormat; // Thêm import này
-import java.text.SimpleDateFormat; // Thêm import này
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
-import java.util.ArrayList;
-
-public class PromoAdapter extends RecyclerView.Adapter<PromoAdapter.ViewHolder>  {
-    //khai bao bien
+public class PromoAdapter extends RecyclerView.Adapter<PromoAdapter.ViewHolder> {
+    // Khai báo biến
     Activity context;
     ArrayList<Promotion> arrPromo;
     icPromoClick icPromoClickm;
     icUsePromoClick icUsePromoClickm;
-    public PromoAdapter(Activity context, ArrayList<Promotion> arrPromo, icPromoClick icPromoClickm, icUsePromoClick icUsePromoClickm){
-        this.context=context;
+
+    // Constructor
+    public PromoAdapter(Activity context, ArrayList<Promotion> arrPromo, icPromoClick icPromoClickm, icUsePromoClick icUsePromoClickm) {
+        this.context = context;
         this.arrPromo = arrPromo;
         this.icPromoClickm = icPromoClickm;
         this.icUsePromoClickm = icUsePromoClickm;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflater= LayoutInflater.from(context);
-        View viewSanPham=layoutInflater.inflate(R.layout.promo_items,parent, false);
-        ViewHolder viewHolderSP=new ViewHolder(viewSanPham);
-        return  viewHolderSP;
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        View viewPromo = layoutInflater.inflate(R.layout.promo_items, parent, false);
+        return new ViewHolder(viewPromo);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Promotion sp= arrPromo.get(position);
+        Promotion promo = arrPromo.get(position);
 
+        // Thiết lập các giá trị cho view
+        holder.tvName.setText(promo.getName());
+        holder.tvDiscount.setText(String.valueOf(promo.getDiscount()));
 
-        holder.tvName.setText(sp.getName());
+        // Xử lý sự kiện xóa và sử dụng mã khuyến mãi
+        holder.btnRemove.setOnClickListener(v -> icPromoClickm.onClick(promo));
+        holder.btnUse.setOnClickListener(v -> icUsePromoClickm.onClick(promo));
 
-        holder.tvDiscount.setText(String.valueOf(sp.getDiscount()));
-
-        holder.btnRemove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                icPromoClickm.onClick(sp);
-            }
-        });
-        holder.btnRemove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                icUsePromoClickm.onClick(sp);
-            }
-        });
-        Date endDate = sp.getEnd().toDate();
-        // Định dạng ngày
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        String formattedEndDate = dateFormat.format(endDate);
-        holder.tvEndDay.setText(formattedEndDate);
+        // Kiểm tra nếu ngày kết thúc không null trước khi định dạng và hiển thị
+        if (promo.getEnd() != null) {
+            Date endDate = promo.getEnd().toDate();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            String formattedEndDate = dateFormat.format(endDate);
+            holder.tvEndDay.setText(formattedEndDate);
+        } else {
+            holder.tvEndDay.setText("Không có ngày kết thúc");
+        }
     }
 
     @Override
@@ -76,18 +70,18 @@ public class PromoAdapter extends RecyclerView.Adapter<PromoAdapter.ViewHolder> 
         return arrPromo.size();
     }
 
-    public class  ViewHolder extends RecyclerView.ViewHolder{
-
+    // ViewHolder class
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvDiscount, tvEndDay;
         ImageButton btnRemove, btnUse;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvPromoName);
-            tvDiscount=itemView.findViewById(R.id.tvDiscount);
-            btnRemove=itemView.findViewById(R.id.btnRemove);
-            btnRemove=itemView.findViewById(R.id.btnUsePromo);
-            tvEndDay=itemView.findViewById(R.id.tvEndDay);
+            tvDiscount = itemView.findViewById(R.id.tvDiscount);
+            btnRemove = itemView.findViewById(R.id.btnRemove);
+            btnUse = itemView.findViewById(R.id.btnUsePromo);
+            tvEndDay = itemView.findViewById(R.id.tvEndDay);
         }
     }
 }
