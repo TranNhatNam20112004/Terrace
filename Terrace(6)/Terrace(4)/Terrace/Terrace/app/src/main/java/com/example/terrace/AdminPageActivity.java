@@ -114,6 +114,11 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
 
     @Override
     public void onClickAtItem(int position) {
-
+        Intent i = new Intent(AdminPageActivity.this, ProductDetailActivity.class);
+        i.putExtra("name", arr_Drinks.get(position).getName());
+        i.putExtra("image", arr_Drinks.get(position).getImage());
+        i.putExtra("detail", arr_Drinks.get(position).getDetail());
+        i.putExtra("price", arr_Drinks.get(position).getPrice());
+        startActivity(i);
     }
 }

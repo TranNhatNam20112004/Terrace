@@ -69,7 +69,6 @@ public class AddProductActivity extends AppCompatActivity {
         String HinhAnh = binding.edtLinkSP.getText().toString().trim();
         // Setup data to save to database
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("MaSP", "");
         hashMap.put("detail", MoTa);
         hashMap.put("image", HinhAnh);
         hashMap.put("name", TenSP);
@@ -83,7 +82,7 @@ public class AddProductActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        documentReference.update("MaSP",documentReference.getId());
+                        documentReference.update("document",documentReference.getId());
                         progressDialog.dismiss();
                         Toast.makeText(AddProductActivity.this, "Thêm thành công", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(AddProductActivity.this, AdminPageActivity.class));

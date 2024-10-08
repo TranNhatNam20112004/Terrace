@@ -48,6 +48,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         String g = String.valueOf(sp.getPrice());
         holder.txtGiaSP.setText(g);
         holder.txtTenSP.setText(sp.getName());
+        holder.itemView.setOnClickListener(v -> productOnClickListener.onClickAtItem(position));
     }
 
     @Override
@@ -63,6 +64,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             ivHinhSP = itemView.findViewById(R.id.ivHinhSP);
             txtTenSP = itemView.findViewById(R.id.txtTenSP);
             txtGiaSP = itemView.findViewById(R.id.txtGiaSP);
+
         }
     }
     public void filterList(ArrayList<Drinks> filteredList) {

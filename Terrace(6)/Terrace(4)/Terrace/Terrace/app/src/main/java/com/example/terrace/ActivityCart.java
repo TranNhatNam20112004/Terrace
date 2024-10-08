@@ -2,6 +2,7 @@ package com.example.terrace;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
@@ -23,7 +24,7 @@ public class ActivityCart extends AppCompatActivity {
     CartAdapter cartAdapter;
     TextView txtTotalPrice;
     float total;
-    Button btnBack;
+    Button btnBack, btnCheckout;;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,14 @@ public class ActivityCart extends AppCompatActivity {
             Intent intent = new Intent(ActivityCart.this, MainActivity.class);
             startActivity(intent);
             finish();
+        });
+        btnCheckout = findViewById(R.id.btnCheckout);
+        btnCheckout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ActivityCart.this, PlaceOrderActivity.class);
+                startActivity(intent);
+            }
         });
     }
 
