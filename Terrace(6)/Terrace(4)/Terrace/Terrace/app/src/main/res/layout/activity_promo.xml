@@ -29,11 +29,12 @@
             android:layout_margin="10dp"
             android:textColor="@color/font_color"/>
     </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPromo"
         android:layout_width="match_parent"
-        android:layout_height="630dp"
-        android:layout_marginTop="30dp"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
