@@ -120,7 +120,7 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
                                     });
                         }
                     } else {
-                        Log.d("Firestore", "No matching documents found");
+                        Log.d("Firestore", "No matching documents found !");
                         Toast.makeText(this, "Không tìm thấy sản phẩm để xóa", Toast.LENGTH_SHORT).show();
                     }
                 });
