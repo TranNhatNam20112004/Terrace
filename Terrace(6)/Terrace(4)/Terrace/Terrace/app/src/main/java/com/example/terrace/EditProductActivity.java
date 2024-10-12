@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -15,7 +17,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.terrace.databinding.ActivityEditProductBinding;
 import com.example.terrace.model.Drinks;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,22 +47,44 @@ public class EditProductActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         btnBackEdt = findViewById(R.id.btn_backEdt);
+        btnBackEdt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         btnEdit = findViewById(R.id.btnEdit);
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("drink")) {
-            drink = (Drinks) intent.getSerializableExtra("drink");
+        String name = getIntent().getStringExtra("drink_name");
+        if (name != null) {
+            db = FirebaseFirestore.getInstance();
 
             // Hiển thị thông tin hiện tại của đồ uống lên các trường nhập liệu
-            binding.edtTenSP.setText(drink.getName());
-            binding.edtHinhSP.setText(drink.getImage());
-            binding.edtMoTa.setText(drink.getDetail());
-            binding.edtGiaSP.setText(String.valueOf(drink.getPrice()));
+            db.collection("drinks").whereEqualTo("name", name)
+                    .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful() && !task.getResult().isEmpty()){
+                                DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                                id = documentSnapshot.getId();
+                                drink = documentSnapshot.toObject(Drinks.class);
+                                binding.edtTenSP.setText(drink.getName());
+                                binding.edtHinhSP.setText(drink.getImage());
+                                binding.edtMoTa.setText(drink.getDetail());
+                                binding.edtGiaSP.setText(String.valueOf(drink.getPrice()));
+                            }
+                        }
+                    });
+
+
+
         }
 
         // Xử lý sự kiện nhấn nút edit
         binding.btnEdit.setOnClickListener(v -> saveProductToFirebase());
     }
 
+    String id ="";
     // Hàm lưu sản phẩm lên Firestore
     private void saveProductToFirebase() {
         String name = binding.edtTenSP.getText().toString();
@@ -83,9 +111,11 @@ public class EditProductActivity extends AppCompatActivity {
         drinkData.put("detail", drink.getDetail());
         drinkData.put("price", drink.getPrice());
 
+
+
         // Cập nhật dữ liệu lên Firestore
-        db.collection("drinks").document(drink.getName()) // Bạn có thể sử dụng ID duy nhất khác cho mỗi sản phẩm
-                .set(drinkData)
+        db.collection("drinks").document(id) // Bạn có thể sử dụng ID duy nhất khác cho mỗi sản phẩm
+                .update(drinkData)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(EditProductActivity.this, "Sản phẩm đã được cập nhật thành công", Toast.LENGTH_SHORT).show();
                     // Trả về dữ liệu sau khi lưu thành công

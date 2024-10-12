@@ -1,15 +1,18 @@
 package com.example.terrace.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.terrace.EditProductActivity;
 import com.example.terrace.R;
 import com.example.terrace.model.Drinks;
 import com.example.terrace.model.Product;
@@ -49,6 +52,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         holder.txtGiaSP.setText(g);
         holder.txtTenSP.setText(sp.getName());
         holder.itemView.setOnClickListener(v -> productOnClickListener.onClickAtItem(position));
+        holder.btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, EditProductActivity.class);
+                i.putExtra("drink_name",sp.getName());
+                context.startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -59,12 +70,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder{
         ImageView ivHinhSP;
         TextView txtTenSP, txtGiaSP;
+        Button btnEdit;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivHinhSP = itemView.findViewById(R.id.ivHinhSP);
             txtTenSP = itemView.findViewById(R.id.txtTenSP);
             txtGiaSP = itemView.findViewById(R.id.txtGiaSP);
-
+            btnEdit = itemView.findViewById(R.id.btn_Edt);
         }
     }
     public void filterList(ArrayList<Drinks> filteredList) {

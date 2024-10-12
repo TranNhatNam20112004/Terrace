@@ -49,7 +49,7 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
         });
         binding = ActivityAdminPageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        addControls();
         binding.btnThemSP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,7 +57,6 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
                 startActivity(intent);
             }
         });
-        addControls();
 
         btnPromo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,6 +65,7 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
                 startActivity(i);
             }
         });
+
     }
     private void filter(String text) {
         ArrayList<Drinks> filteredList = new ArrayList<>();
@@ -91,7 +91,6 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
     }
     private void loadData() {
         // Listen for real-time updates in the 'drinks' collection
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("drinks")
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) {
