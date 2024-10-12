@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txtName;
     SearchView searchView; // Khai báo SearchView
     float totalPrice = 0; // Giá trị tổng cho giỏ hàng
-
+    String name;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,14 +85,13 @@ public class MainActivity extends AppCompatActivity {
         // Gán username
         txtName = findViewById(R.id.txtName);
         Intent i = getIntent();
-        String name = i.getStringExtra("name");
+        name = i.getStringExtra("name");
         txtName.setText(name);
 
         // Gán sự kiện cho giỏ hàng
         btnCart = findViewById(R.id.btnCart);
         btnCart.setOnClickListener(v -> {
             Intent i1 = new Intent(MainActivity.this, ActivityCart.class);
-            i1.putExtra("total", totalPrice);
             startActivity(i1);
         });
 
@@ -159,21 +158,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void AddProduct(Drinks drinks) {
-        // Tạo một đối tượng Cart từ sản phẩm Drinks
-        cart cartItem = new cart(drinks.getName(), drinks.getImage(), txtName.getText().toString(), drinks.getPrice(), 1.0f);
-
-        // Thêm sản phẩm vào Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String cartItemId = db.collection("cart").document().getId();  // Firestore will generate a unique ID
+        // Khởi tạo đối tượng cart với ID vừa tạo
+        cart cartItem = new cart( drinks.getName(),cartItemId, drinks.getImage(),name, drinks.getPrice(), 1.0f);
+        // Thêm sản phẩm vào Firestore với ID đã chỉ định
         db.collection("cart")
-                .add(cartItem)
+                .document(cartItemId)  // Set document ID
+                .set(cartItem)  // Use set() to assign the ID explicitly
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(MainActivity.this, "Sản phẩm đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-                    totalPrice += cartItem.getPrice();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(MainActivity.this, "Thêm sản phẩm vào giỏ hàng thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     // Hàm lọc sản phẩm theo tên
     private void filter(String text) {

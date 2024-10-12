@@ -4,12 +4,15 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.example.terrace.Interface.icDeleteDrinkClick;
 import com.example.terrace.R;
 import com.example.terrace.model.Drinks;
 import com.example.terrace.model.Product;
@@ -21,13 +24,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     private Context context;
     private ArrayList<Drinks> arr_Product;
     ProductOnClickListener productOnClickListener;
-
+    private icDeleteDrinkClick icDeleteDrinkClickm;
     FirebaseFirestore db;
 
-    public ProductAdapter(Context context, ArrayList<Drinks> arr_Product, ProductOnClickListener productOnClickListener){
+    public ProductAdapter(Context context, ArrayList<Drinks> arr_Product, ProductOnClickListener productOnClickListener,icDeleteDrinkClick icDeleteDrinkClickm){
         this.context = context;
         this.arr_Product = arr_Product;
         this.productOnClickListener = productOnClickListener;
+        this.icDeleteDrinkClickm = icDeleteDrinkClickm;
     }
 
     @NonNull
@@ -44,11 +48,19 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         db = FirebaseFirestore.getInstance();
         Drinks sp =  arr_Product.get(position);
 
-        Picasso.get().load(sp.getImage()).into(holder.ivHinhSP);
+        Glide.with(context)
+                .load(sp.getImage())
+                .into(holder.ivHinhSP);
         String g = String.valueOf(sp.getPrice());
         holder.txtGiaSP.setText(g);
         holder.txtTenSP.setText(sp.getName());
         holder.itemView.setOnClickListener(v -> productOnClickListener.onClickAtItem(position));
+        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                icDeleteDrinkClickm.onDrinkClick(sp);
+            }
+        });
     }
 
     @Override
@@ -59,12 +71,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder{
         ImageView ivHinhSP;
         TextView txtTenSP, txtGiaSP;
+        ImageButton btnDelete;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivHinhSP = itemView.findViewById(R.id.ivHinhSP);
             txtTenSP = itemView.findViewById(R.id.txtTenSP);
             txtGiaSP = itemView.findViewById(R.id.txtGiaSP);
-
+            btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
     public void filterList(ArrayList<Drinks> filteredList) {

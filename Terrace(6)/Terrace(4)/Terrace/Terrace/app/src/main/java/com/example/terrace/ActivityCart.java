@@ -23,7 +23,7 @@ public class ActivityCart extends AppCompatActivity {
     ArrayList<cart> arr_Cart;
     CartAdapter cartAdapter;
     TextView txtTotalPrice;
-    float total;
+    float total = 0;
     Button btnBack, btnCheckout;;
 
     @Override
@@ -31,7 +31,7 @@ public class ActivityCart extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_cart);
-
+        Intent i = getIntent();
         arr_Cart = new ArrayList<>();
         loadData();
         rvCart = findViewById(R.id.rvCart);
@@ -48,8 +48,6 @@ public class ActivityCart extends AppCompatActivity {
         rvCart.setLayoutManager(staggeredGridLayoutManager);
 
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
-        Intent i = getIntent();
-        total = i.getFloatExtra("total", 0);
         txtTotalPrice.setText(String.valueOf(total));
 
         // Xử lý sự kiện khi nhấn nút Back
@@ -76,11 +74,15 @@ public class ActivityCart extends AppCompatActivity {
                         return;
                     }
                     arr_Cart.clear();
+                    total = 0;  // Reset total to 0
                     for (QueryDocumentSnapshot document : snapshots) {
                         cart cart = document.toObject(cart.class);
                         arr_Cart.add(cart);
+                        total += cart.getPrice();  // Add cart item's price
                     }
                     cartAdapter.notifyDataSetChanged();
+                    txtTotalPrice.setText(String.valueOf(total));  // Update total price
                 });
     }
+
 }

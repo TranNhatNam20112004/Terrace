@@ -1,7 +1,7 @@
 package com.example.terrace.model;
 
 public class cart {
-    private String name, image,user;
+    private String name, image,user, id;
     private float price, quantity;
 
     public cart() {
@@ -14,6 +14,23 @@ public class cart {
         this.user = user;
         this.price = price;
         this.quantity = quantity;
+    }
+
+    public cart(String name,String id, String image, String user, float price, float quantity) {
+        this.name = name;
+        this.image = image;
+        this.user = user;
+        this.id = id;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUser() {
