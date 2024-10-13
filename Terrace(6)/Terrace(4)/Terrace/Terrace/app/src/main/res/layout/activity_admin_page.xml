@@ -36,10 +36,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSP"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
-
+        android:layout_width="355dp"
+        android:layout_height="560dp"
         android:layout_below="@+id/toolbarRl"
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
@@ -54,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/rvSP"
-        android:layout_marginBottom="-6dp"
+        android:layout_marginBottom="-80dp"
         android:orientation="horizontal">
 
         <Button

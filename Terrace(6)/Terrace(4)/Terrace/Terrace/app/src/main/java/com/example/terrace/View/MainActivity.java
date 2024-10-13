@@ -65,8 +65,10 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == R.id.nav_home) {
                 Toast.makeText(MainActivity.this, "Home selected", Toast.LENGTH_SHORT).show();
                 return true;
-            } else if (itemId == R.id.nav_gift) {
-                Toast.makeText(MainActivity.this, "Gift selected", Toast.LENGTH_SHORT).show();
+            } else if (itemId == R.id.nav_store) {
+                //Toast.makeText(MainActivity.this, "Store selected", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(MainActivity.this, ViewBranchsActivity.class);
+                startActivity(i);
                 return true;
             } else if (itemId == R.id.nav_list) {
                 Toast.makeText(MainActivity.this, "List selected", Toast.LENGTH_SHORT).show();
@@ -191,4 +193,5 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Không tìm thấy sản phẩm nào", Toast.LENGTH_SHORT).show();
         }
     }
+
 }

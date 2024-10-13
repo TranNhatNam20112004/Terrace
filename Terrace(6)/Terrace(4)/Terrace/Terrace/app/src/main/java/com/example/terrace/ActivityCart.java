@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,7 +42,7 @@ public class ActivityCart extends AppCompatActivity {
         cartAdapter = new CartAdapter(this, arr_Cart, new icCartClick() {
             @Override
             public void onCartClick(cart cart) {
-                // Handle cart click here
+               //deleteCart(cart.getId());
             }
         });
         rvCart.setAdapter(cartAdapter);
@@ -65,6 +67,20 @@ public class ActivityCart extends AppCompatActivity {
             }
         });
     }
+
+    private void deleteCart(String cartId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("cart").document(cartId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(ActivityCart.this, "Sản phẩm đã được xoa khoi giỏ hàng", Toast.LENGTH_SHORT).show();
+                    loadData();  // Tải lại dữ liệu sau khi xóa
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(ActivityCart.this, "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     private void loadData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
