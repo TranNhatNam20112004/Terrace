@@ -3,6 +3,8 @@ package com.example.terrace.View;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,51 +39,87 @@ public class LoginActivity extends AppCompatActivity {
         edtPass = findViewById(R.id.edtPass);
         btnForgot = findViewById(R.id.btnForgot); // Nút Forgot Password
 
-        // Sự kiện cho nút Forgot Password
-        btnForgot.setOnClickListener(new View.OnClickListener() {
+        // Disable login button initially
+        btnLog = findViewById(R.id.btnLogin);
+        btnLog.setEnabled(false); // Disable the button at start
+
+        // TextWatcher để kiểm tra dữ liệu nhập vào
+        edtEmail.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
-                startActivity(intent); // Chuyển qua ForgetPasswordActivity
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validateInput(); // Validate input on text change
             }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
+        edtPass.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validateInput(); // Validate input on text change
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
+        // Sự kiện cho nút Forgot Password
+        btnForgot.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginActivity.this, NewPassword.class);
+            startActivity(intent); // Chuyển qua ForgetPasswordActivity
         });
 
         // Sự kiện cho nút Sign Up
         btnRes = findViewById(R.id.cardRes);
-        btnRes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(LoginActivity.this, RegeisterAvtivity.class);
-                startActivity(i);
-            }
+        btnRes.setOnClickListener(view -> {
+            Intent i = new Intent(LoginActivity.this, RegeisterAvtivity.class);
+            startActivity(i);
         });
 
         // Sự kiện cho nút Login
-        btnLog = findViewById(R.id.btnLogin);
-        btnLog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CheckUser();
-            }
+        btnLog.setOnClickListener(view -> {
+            CheckUser();
         });
 
         // Sự kiện cho nút Back
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(LoginActivity.this, Introduce.class);
-                startActivity(i);
-            }
+        btnBack.setOnClickListener(view -> {
+            Intent i = new Intent(LoginActivity.this, Introduce.class);
+            startActivity(i);
         });
+    }
+
+    private void validateInput() {
+        String email = edtEmail.getText().toString().trim();
+        String pass = edtPass.getText().toString().trim();
+
+        // Kiểm tra nếu email có đuôi @gmail.com và cả email và password không được rỗng
+        boolean isEmailValid = email.endsWith("@gmail.com");
+        boolean isInputValid = !email.isEmpty() && !pass.isEmpty() && isEmailValid;
+
+        // Chỉ kích hoạt nút login nếu đầu vào hợp lệ
+        btnLog.setEnabled(isInputValid);
     }
 
     private void CheckUser() {
         String email = edtEmail.getText().toString().trim();
         String pass = edtPass.getText().toString().trim();
 
-        // Check if email or password is empty
+        // Kiểm tra nếu email hoặc password để trống
         if (email.isEmpty() || pass.isEmpty()) {
-            Toast.makeText(this, "Email and password must not be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Email và mật khẩu không được để trống", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Kiểm tra nếu email không có đuôi @gmail.com
+        if (!email.endsWith("@gmail.com")) {
+            Toast.makeText(this, "Email phải có đuôi @gmail.com", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -110,11 +148,11 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                         }
                     } else {
-                        Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Email hoặc mật khẩu không hợp lệ", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error fetching data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Lỗi khi lấy dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }

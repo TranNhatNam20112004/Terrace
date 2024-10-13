@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.terrace.Adapter.ProductAdapter;
 import com.example.terrace.Interface.icDeleteDrinkClick;
+import com.example.terrace.View.LoginActivity;
 import com.example.terrace.databinding.ActivityAdminPageBinding;
 import com.example.terrace.model.Drinks;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -31,6 +33,7 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
     private ProductAdapter adapterProduct;
     private FirebaseFirestore db;
     private Button btnPromo;
+    private ImageButton btnLogout; // Khai báo btnLogout
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,9 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
         // Initialize ProductAdapter
         adapterProduct = new ProductAdapter(this, arr_Drinks, this, this::deleteProduct);
         recyclerViewSP.setAdapter(adapterProduct);
+
+        // Khởi tạo btnLogout
+        btnLogout = binding.btnLogout; // Lấy nút từ binding
     }
 
     private void setupListeners() {
@@ -75,6 +81,14 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
         btnPromo.setOnClickListener(v -> {
             Intent i = new Intent(AdminPageActivity.this, PromoActivity.class);
             startActivity(i);
+        });
+
+        // Thiết lập sự kiện cho btnLogout
+        btnLogout.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminPageActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK); // Để clear stack
+            startActivity(intent);
+            finish(); // Kết thúc AdminPageActivity
         });
     }
 
