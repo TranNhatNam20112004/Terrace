@@ -33,6 +33,7 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
     private ProductAdapter adapterProduct;
     private FirebaseFirestore db;
     private Button btnPromo;
+    private ImageButton btnBack; // Khai báo btnBack
     private ImageButton btnLogout; // Khai báo btnLogout
 
     @Override
@@ -67,20 +68,23 @@ public class AdminPageActivity extends AppCompatActivity implements ProductAdapt
         adapterProduct = new ProductAdapter(this, arr_Drinks, this, this::deleteProduct);
         recyclerViewSP.setAdapter(adapterProduct);
 
-        // Khởi tạo btnLogout
-        btnLogout = binding.btnLogout; // Lấy nút từ binding
+        // Khởi tạo btnBack và btnLogout
+        btnBack = binding.btnBack; // Liên kết với nút btnBack trong layout
+        btnLogout = binding.btnLogout; // Liên kết với nút btnLogout trong layout
     }
 
     private void setupListeners() {
+        // Sự kiện nhấn nút "Thêm Sản Phẩm"
         binding.btnThemSP.setOnClickListener(v -> {
             Intent intent = new Intent(AdminPageActivity.this, AddProductActivity.class);
             startActivity(intent);
         });
 
-        btnPromo = binding.btnPromo;
-        btnPromo.setOnClickListener(v -> {
-            Intent i = new Intent(AdminPageActivity.this, PromoActivity.class);
-            startActivity(i);
+        // Thiết lập sự kiện cho btnBack
+        btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminPageActivity.this, AdminActivity.class);
+            startActivity(intent);
+            finish(); // Kết thúc AdminPageActivity để không quay lại đây khi nhấn nút back của hệ thống
         });
 
         // Thiết lập sự kiện cho btnLogout

@@ -15,6 +15,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.example.terrace.AdminActivity;
 import com.example.terrace.AdminPageActivity;
 import com.example.terrace.R;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -143,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
                             startActivity(intent);
                             finish();
                         } else if ("admin".equals(role)) {
-                            Intent intent = new Intent(LoginActivity.this, AdminPageActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
                             startActivity(intent);
                             finish();
                         }
