@@ -1,10 +1,11 @@
 package com.example.terrace.View;
 
+import static com.example.terrace.Adapter.SanPhamAdapter.*;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -18,9 +19,11 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.example.terrace.AccountInforActivity;
 import com.example.terrace.ActivityCart;
 import com.example.terrace.Adapter.SanPhamAdapter;
 import com.example.terrace.Interface.icDrinkClick;
+import com.example.terrace.ProductDetailActivity;
 import com.example.terrace.R;
 import com.example.terrace.model.Drinks;
 import com.example.terrace.model.cart;
@@ -71,7 +74,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
                 return true;
             } else if (itemId == R.id.nav_list) {
-                Toast.makeText(MainActivity.this, "List selected", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "List selected", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(MainActivity.this, AccountInforActivity.class);
+                i.putExtra("name",name);
+                startActivity(i);
                 return true;
             }
             return false;
@@ -150,9 +156,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewSP = findViewById(R.id.recyclerSanPham);
         arr_Drinks = new ArrayList<>();
         arr_DrinksFull = new ArrayList<>(); // Khởi tạo danh sách đầy đủ
-        sanPhamAdapter = new SanPhamAdapter(this, arr_Drinks, drinks -> {
-            AddProduct(drinks);
-        });
+        sanPhamAdapter = new SanPhamAdapter(this, arr_Drinks, new icDrinkClick() {
+            @Override
+            public void onDrinkClick(Drinks drinks) {
+                AddProduct(drinks);
+            }
+
+            @Override
+            public void onItemClick(int position) {
+                Intent i = new Intent(MainActivity.this, ProductDetailActivity.class);
+                i.putExtra("name", arr_Drinks.get(position).getName());
+                i.putExtra("image", arr_Drinks.get(position).getImage());
+                i.putExtra("detail", arr_Drinks.get(position).getDetail());
+                i.putExtra("price", arr_Drinks.get(position).getPrice());
+                startActivity(i);
+            }
+
+    });
         recyclerViewSP.setAdapter(sanPhamAdapter);
         StaggeredGridLayoutManager staggeredGridLayoutManager =
                 new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
@@ -193,5 +213,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Không tìm thấy sản phẩm nào", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 }

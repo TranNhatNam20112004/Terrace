@@ -49,6 +49,7 @@ public class SanPhamAdapter extends RecyclerView.Adapter<SanPhamAdapter.ViewHold
         holder.txtGia.setText(String.valueOf(sp.getPrice()));
 
         holder.btnAdd.setOnClickListener(v -> icDrinkClickm.onDrinkClick(sp));
+        holder.itemView.setOnClickListener(v ->icDrinkClickm.onItemClick(position));
 
     }
 

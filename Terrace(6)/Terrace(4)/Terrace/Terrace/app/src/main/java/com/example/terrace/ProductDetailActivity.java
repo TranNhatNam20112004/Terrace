@@ -19,7 +19,7 @@ import com.squareup.picasso.Picasso;
 
 public class ProductDetailActivity extends AppCompatActivity {
     Button btn_AddToCart, btn_back1;
-    ImageButton btn_Cart;
+    //ImageButton btn_Cart;
     TextView txtProName1, txtProName2, txtProDescr, txtProPrice;
     ImageView imgSP;
 
@@ -51,13 +51,13 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
         });
 
-        btn_Cart.setOnClickListener(new View.OnClickListener() {
+        /*btn_Cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ProductDetailActivity.this, ActivityCart.class);
                 startActivity(intent);
             }
-        });
+        });*/
 
         Bundle b = getIntent().getExtras();
         if(b!=null){
@@ -68,7 +68,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             txtProName1.setText(t);
             txtProName2.setText(t);
             txtProDescr.setText(m);
-            txtProPrice.setText(String.valueOf(b.getInt("price")));
+            txtProPrice.setText(String.valueOf(b.getFloat("price")));
         }
     }
 }

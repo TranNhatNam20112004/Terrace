@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,17 +36,23 @@ import com.example.terrace.databinding.ActivityAdminPageBinding;
 import com.example.terrace.databinding.ActivityPlaceOrderBinding;
 import com.example.terrace.model.Drinks;
 import com.example.terrace.model.cart;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlaceOrderActivity extends AppCompatActivity {
     private ActivityPlaceOrderBinding binding;
     private ArrayList<cart> arr_Cart;
     private CartAdapter cartAdapter;
     private RecyclerView rvCart;
-    float total;
+    float total = 0;
     TextView txtTotalPrice;
     private FirebaseFirestore db;
 
@@ -71,12 +79,18 @@ public class PlaceOrderActivity extends AppCompatActivity {
         rvCart.setLayoutManager(gridLayoutManager);
         db = FirebaseFirestore.getInstance();
 
+        binding.btnbackOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         binding.btnOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //openDialog(Gravity.CENTER);
-                Intent i = new Intent(PlaceOrderActivity.this, MainActivity.class);
-                startActivity(i);
+                placeOrder();
 
             }
         });
@@ -90,38 +104,95 @@ public class PlaceOrderActivity extends AppCompatActivity {
             }
         });
         rvCart.setAdapter(cartAdapter);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        rvCart.setLayoutManager(staggeredGridLayoutManager);
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
-        Intent i = getIntent();
-        total = i.getFloatExtra("total", 0);
         txtTotalPrice.setText(String.valueOf(total));
-
-
     }
 
     private void loadData() {
-        // Listen for real-time updates in the 'drinks' collection
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("cart")
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) {
-                        Log.w("Firestore", "Listen failed.", error);
                         return;
                     }
-
-                    // Clear the list to avoid duplicates
                     arr_Cart.clear();
-
-                    // Duyệt qua từng tài liệu (product) trong collection "drinks"
+                    total = 0;  // Reset total to 0
                     for (QueryDocumentSnapshot document : snapshots) {
-                        // Chuyển đổi tài liệu thành đối tượng Drinks
                         cart cart = document.toObject(cart.class);
                         arr_Cart.add(cart);
+                        total += cart.getPrice();  // Add cart item's price
                     }
-
-                    // Notify adapter that data has changed
                     cartAdapter.notifyDataSetChanged();
+                    txtTotalPrice.setText(String.valueOf(total));  // Update total price
                 });
     }
+
+    String userId ="";
+    private void placeOrder() {
+        // Lấy thông tin từ các EditText
+        String nameNH = binding.edtTenNH.getText().toString().trim();
+        String phoneNH = binding.edtPhoneNH.getText().toString().trim();
+        String addrNH = binding.edtAddrNH.getText().toString().trim();
+        String orderNote = binding.edtNoteNH.getText().toString().trim();
+
+        // Kiểm tra dữ liệu nhập
+        if (nameNH.isEmpty() || phoneNH.isEmpty() || addrNH.isEmpty()) {
+            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin giao hàng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (phoneNH.length() != 10) {
+            Toast.makeText(this, "Số điện thoại không đúng định dạng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Lấy tổng tiền từ TextView
+        String totalPrice = binding.txtTotalPrice.getText().toString().trim();
+        float totalamount;
+        try {
+            totalamount = Float.parseFloat(totalPrice);
+        } catch (NumberFormatException e) {
+            totalamount = 0;
+        }
+
+        // Lấy phương thức thanh toán
+        String paymentMethod = "Thanh toán khi nhận hàng";
+
+        // Tạo Order object
+        Map<String, Object> order = new HashMap<>();
+        order.put("orderId", "");
+        order.put("orderdate", Timestamp.now());
+        order.put("paymethod", paymentMethod);
+        order.put("phone", phoneNH);
+        order.put("address", addrNH);
+        order.put("status", "Chưa giải quyết");
+        order.put("totalamount", totalamount);
+        order.put("userId", "");
+        order.put("username", nameNH);
+        order.put("orderNote", orderNote);
+
+
+        // Thêm tài liệu vào Firestore
+        db.collection("orders").add(order)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        documentReference.update("orderId",documentReference.getId());
+                        Toast.makeText(PlaceOrderActivity.this, "Đặt hàng thành công", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(PlaceOrderActivity.this, "Đặt hàng thất bại" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+        Intent intent = new Intent(PlaceOrderActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
         /*private void openDialog(int gravity){
             final Dialog dialog = new Dialog(this);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
