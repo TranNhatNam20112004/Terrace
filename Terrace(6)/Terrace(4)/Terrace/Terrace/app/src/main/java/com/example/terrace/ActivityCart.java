@@ -42,7 +42,7 @@ public class ActivityCart extends AppCompatActivity {
         cartAdapter = new CartAdapter(this, arr_Cart, new icCartClick() {
             @Override
             public void onCartClick(cart cart) {
-               //deleteCart(cart.getId());
+               deleteCart(cart.getId());
             }
         });
         rvCart.setAdapter(cartAdapter);
