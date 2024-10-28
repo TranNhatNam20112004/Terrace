@@ -1,10 +1,12 @@
 package com.example.terrace.Adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.terrace.Interface.icCartClick;
+import com.example.terrace.Interface.icUpdateCartClick;
 import com.example.terrace.R;
 import com.example.terrace.model.Drinks;
 import com.example.terrace.model.cart;
@@ -25,11 +28,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>  {
     Activity context;
     ArrayList<cart> arr_Cart;
     icCartClick icCartClickm;
+    icUpdateCartClick icUpdateCartClickm;
 
-    public CartAdapter(Activity context, ArrayList<cart> arr_Cart,icCartClick icCartClickm){
+    int quan = 1;
+
+    public CartAdapter(Activity context, ArrayList<cart> arr_Cart,
+                       icCartClick icCartClickm,
+                       icUpdateCartClick icUpdateCartClickm){
         this.context=context;
         this.arr_Cart = arr_Cart;
         this.icCartClickm = icCartClickm;
+        this.icUpdateCartClickm = icUpdateCartClickm;
     }
     @NonNull
     @Override
@@ -41,9 +50,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>  {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         cart sp= arr_Cart.get(position);
-
+        float currentQuantity = sp.getQuantity(); // Lấy số lượng hiện tại từ đối tượng Product
+        float price = sp.getPrice() / currentQuantity; // Tính giá đơn vị của sản phẩm
         Glide.with(context)
                 .load(sp.getImage())
                 .into(holder.imgProduct);
@@ -57,7 +67,37 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>  {
                 icCartClickm.onCartClick(sp);
             }
         });
-        holder.tvQuantity.setText(String.valueOf(sp.getQuantity()));
+        holder.tvQuantity.setText(String.valueOf((int)sp.getQuantity()));
+
+        holder.btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sp.setQuantity(sp.getQuantity() + 1);
+                holder.tvQuantity.setText(String.valueOf((int)sp.getQuantity()));
+                float newPrice = price * sp.getQuantity();
+                sp.setPrice(newPrice);
+                holder.txtProductPrice.setText(String.valueOf(newPrice));
+                icUpdateCartClickm.onCartClick(sp);
+                notifyItemChanged(position); // Thông báo RecyclerView cập nhật item
+            }
+        });
+
+        holder.btnLess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(sp.getQuantity() > 1) {
+                    sp.setQuantity(sp.getQuantity() - 1);
+                    holder.tvQuantity.setText(String.valueOf((int)sp.getQuantity()));
+                    float newPrice = price * sp.getQuantity();
+                    sp.setPrice(newPrice);
+                    holder.txtProductPrice.setText(String.valueOf(newPrice));
+                    icUpdateCartClickm.onCartClick(sp);
+                    notifyItemChanged(position); // Thông báo RecyclerView cập nhật item
+                }
+            }
+        });
+
+
 
 
     }
@@ -71,7 +111,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>  {
         ImageView imgProduct;
         TextView txtProductName, txtProductPrice, tvQuantity;
         ImageButton btnRemoveProduct;
-
+        Button btnLess, btnAdd;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imgProduct=itemView.findViewById(R.id.imgProduct);
@@ -79,6 +119,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>  {
             txtProductPrice=itemView.findViewById(R.id.txtProductPrice);
             btnRemoveProduct=itemView.findViewById(R.id.btnRemoveProduct);
             tvQuantity=itemView.findViewById(R.id.tvQuantity);
+            btnLess = itemView.findViewById(R.id.btnLess);
+            btnAdd = itemView.findViewById(R.id.btnAdd);
         }
     }
 }

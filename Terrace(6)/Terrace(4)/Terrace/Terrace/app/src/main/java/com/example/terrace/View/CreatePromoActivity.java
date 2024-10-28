@@ -75,22 +75,27 @@ public class CreatePromoActivity extends AppCompatActivity {
     private void createPromo(String name, int discount, Timestamp startDate, Timestamp endDate, int quantity) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Tạo đối tượng Promotion
-        Promotion promo = new Promotion(name, discount, startDate, endDate, quantity);
+        // Tạo ID tự động
+        String promoId = db.collection("promotion").document().getId(); // Tạo ID mới
+
+        // Tạo đối tượng Promotion với ID mới
+        Promotion promo = new Promotion(promoId, name, discount, startDate, endDate, quantity);
 
         // Thêm vào Firestore
         db.collection("promotion")
-                .add(promo)  // Sử dụng phương thức add() để tự động tạo ID
-                .addOnSuccessListener(documentReference -> {
-                    Log.d("Firestore", "Khuyến mãi mới đã được tạo với ID: " + documentReference.getId());
+                .document(promoId) // Sử dụng ID đã tạo
+                .set(promo) // Sử dụng phương thức set() để lưu tài liệu
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "Khuyến mãi mới đã được tạo với ID: " + promoId);
                     Toast.makeText(CreatePromoActivity.this, "Khuyến mãi đã được thêm thành công!", Toast.LENGTH_SHORT).show();
-                    finish();  // Đóng Activity sau khi thêm khuyến mãi
+                    finish(); // Đóng Activity sau khi thêm khuyến mãi
                 })
                 .addOnFailureListener(e -> {
                     Log.w("Firestore", "Tạo khuyến mãi thất bại.", e);
                     Toast.makeText(CreatePromoActivity.this, "Tạo khuyến mãi thất bại!", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     // Phương thức chuyển đổi String thành Timestamp
     private Timestamp convertStringToTimestamp(String dateString) {

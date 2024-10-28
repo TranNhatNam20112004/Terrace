@@ -14,14 +14,18 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.terrace.Adapter.PromoAdapter;
 import com.example.terrace.Interface.icPromoClick;
+import com.example.terrace.Interface.icUpdatePromoClick;
 import com.example.terrace.Interface.icUsePromoClick;
 import com.example.terrace.View.CreatePromoActivity;
+import com.example.terrace.View.UpdatePromoActivity;
 import com.example.terrace.model.Drinks;
 import com.example.terrace.model.Promotion;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class PromoActivity extends AppCompatActivity {
 
@@ -42,13 +46,21 @@ public class PromoActivity extends AppCompatActivity {
 
         promoAdapter = new PromoAdapter(this, arrPro, new icPromoClick() {
             @Override
-            public void onClick(Promotion promo) {
-                deletePromo(promo);
+            public void onClick(Promotion promo)
+            {
+                //deletePromo(promo);
             }
         }, new icUsePromoClick() {
             @Override
             public void onClick(Promotion promo) {
-                applyPromo(promo);
+                //applyPromo(promo);
+            }
+        }, new icUpdatePromoClick() {
+            @Override
+            public void onClick(Promotion promo) {
+                Intent i = new Intent(PromoActivity.this, UpdatePromoActivity.class);
+                i.putExtra("id", promo.getId());
+                startActivity(i);
             }
         });
 

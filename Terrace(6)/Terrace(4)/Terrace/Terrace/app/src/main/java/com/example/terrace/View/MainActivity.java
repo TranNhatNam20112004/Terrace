@@ -51,7 +51,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         addControls();
         loadData();
-
+        // Gán username
+        txtName = findViewById(R.id.txtName);
+        Intent i = getIntent();
+        name = i.getStringExtra("name");
+        txtName.setText(name);
         // Điều chỉnh padding khi có system bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -70,14 +74,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.nav_store) {
                 //Toast.makeText(MainActivity.this, "Store selected", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(MainActivity.this, ViewBranchsActivity.class);
-                startActivity(i);
+                Intent i2 = new Intent(MainActivity.this, ViewBranchsActivity.class);
+                startActivity(i2);
                 return true;
             } else if (itemId == R.id.nav_list) {
                 //Toast.makeText(MainActivity.this, "List selected", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(MainActivity.this, AccountInforActivity.class);
-                i.putExtra("name",name);
-                startActivity(i);
+                Intent i2 = new Intent(MainActivity.this, AccountInforActivity.class);
+                i2.putExtra("name",name);
+                startActivity(i2);
                 return true;
             }
             return false;
@@ -86,20 +90,18 @@ public class MainActivity extends AppCompatActivity {
         // Sự kiện logout
         btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(view -> {
-            Intent i = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(i);
+            Intent i2 = new Intent(MainActivity.this, LoginActivity.class);
+
+            startActivity(i2);
         });
 
-        // Gán username
-        txtName = findViewById(R.id.txtName);
-        Intent i = getIntent();
-        name = i.getStringExtra("name");
-        txtName.setText(name);
+
 
         // Gán sự kiện cho giỏ hàng
         btnCart = findViewById(R.id.btnCart);
         btnCart.setOnClickListener(v -> {
             Intent i1 = new Intent(MainActivity.this, ActivityCart.class);
+            i1.putExtra("name", name);
             startActivity(i1);
         });
 
@@ -181,18 +183,45 @@ public class MainActivity extends AppCompatActivity {
 
     private void AddProduct(Drinks drinks) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String cartItemId = db.collection("cart").document().getId();  // Firestore will generate a unique ID
-        // Khởi tạo đối tượng cart với ID vừa tạo
-        cart cartItem = new cart( drinks.getName(),cartItemId, drinks.getImage(),name, drinks.getPrice(), 1.0f);
-        // Thêm sản phẩm vào Firestore với ID đã chỉ định
+
+        // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng của người dùng chưa
         db.collection("cart")
-                .document(cartItemId)  // Set document ID
-                .set(cartItem)  // Use set() to assign the ID explicitly
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(MainActivity.this, "Sản phẩm đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(MainActivity.this, "Thêm sản phẩm vào giỏ hàng thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                .whereEqualTo("name", drinks.getName())
+                .whereEqualTo("user", name)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        // Nếu sản phẩm đã tồn tại, lấy document và cập nhật quantity
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            cart existingCartItem = document.toObject(cart.class);
+                            float newQuantity = existingCartItem.getQuantity() + 1;
+                            existingCartItem.setQuantity(newQuantity);
+
+                            // Tính lại giá dựa trên số lượng mới
+                            existingCartItem.setPrice(drinks.getPrice() * newQuantity);
+
+                            // Cập nhật lại sản phẩm trong Firestore
+                            db.collection("cart")
+                                    .document(document.getId())
+                                    .set(existingCartItem)
+                                    .addOnSuccessListener(aVoid ->
+                                            Toast.makeText(MainActivity.this, "Đã cập nhật số lượng sản phẩm trong giỏ hàng", Toast.LENGTH_SHORT).show())
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(MainActivity.this, "Cập nhật sản phẩm thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        }
+                    } else {
+                        // Nếu sản phẩm chưa tồn tại, thêm mới vào giỏ hàng
+                        String cartItemId = db.collection("cart").document().getId();
+                        cart cartItem = new cart(drinks.getName(), cartItemId, drinks.getImage(), name, drinks.getPrice(), 1);
+
+                        db.collection("cart")
+                                .document(cartItemId)
+                                .set(cartItem)
+                                .addOnSuccessListener(aVoid ->
+                                        Toast.makeText(MainActivity.this, "Sản phẩm đã được thêm vào giỏ hàng", Toast.LENGTH_SHORT).show())
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(MainActivity.this, "Thêm sản phẩm vào giỏ hàng thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    }
                 });
     }
 

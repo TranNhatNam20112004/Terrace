@@ -21,6 +21,15 @@ public class Promotion {
         this.quantity = quantity;
     }
 
+    public Promotion(String id, String name, int discount, Timestamp start, Timestamp end, int quantity) {
+        this.id = id;
+        this.name = name;
+        this.discount = discount;
+        this.start = start;
+        this.end = end;
+        this.quantity = quantity;
+    }
+
     public Promotion(String name, int discount, Timestamp start, Timestamp end, int quantity) {
         this.name = name;
         this.discount = discount;

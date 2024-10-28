@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.terrace.Interface.icPromoClick;
+import com.example.terrace.Interface.icUpdatePromoClick;
 import com.example.terrace.Interface.icUsePromoClick;
 import com.example.terrace.R;
 import com.example.terrace.model.Promotion;
@@ -25,13 +26,16 @@ public class PromoAdapter extends RecyclerView.Adapter<PromoAdapter.ViewHolder> 
     ArrayList<Promotion> arrPromo;
     icPromoClick icPromoClickm;
     icUsePromoClick icUsePromoClickm;
-
+    icUpdatePromoClick icUpdatePromoClickm;
     // Constructor
-    public PromoAdapter(Activity context, ArrayList<Promotion> arrPromo, icPromoClick icPromoClickm, icUsePromoClick icUsePromoClickm) {
+    public PromoAdapter(Activity context, ArrayList<Promotion> arrPromo,
+                        icPromoClick icPromoClickm, icUsePromoClick icUsePromoClickm,
+                        icUpdatePromoClick icUpdatePromoClickm) {
         this.context = context;
         this.arrPromo = arrPromo;
         this.icPromoClickm = icPromoClickm;
         this.icUsePromoClickm = icUsePromoClickm;
+        this.icUpdatePromoClickm = icUpdatePromoClickm;
     }
 
     @NonNull
@@ -53,7 +57,7 @@ public class PromoAdapter extends RecyclerView.Adapter<PromoAdapter.ViewHolder> 
         // Xử lý sự kiện xóa và sử dụng mã khuyến mãi
         holder.btnRemove.setOnClickListener(v -> icPromoClickm.onClick(promo));
         holder.btnUse.setOnClickListener(v -> icUsePromoClickm.onClick(promo));
-
+        holder.btnEdit.setOnClickListener(v -> icUpdatePromoClickm.onClick(promo));
         // Kiểm tra nếu ngày kết thúc không null trước khi định dạng và hiển thị
         if (promo.getEnd() != null) {
             Date endDate = promo.getEnd().toDate();
@@ -73,7 +77,7 @@ public class PromoAdapter extends RecyclerView.Adapter<PromoAdapter.ViewHolder> 
     // ViewHolder class
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvDiscount, tvEndDay;
-        ImageButton btnRemove, btnUse;
+        ImageButton btnRemove, btnUse,btnEdit;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -81,6 +85,7 @@ public class PromoAdapter extends RecyclerView.Adapter<PromoAdapter.ViewHolder> 
             tvDiscount = itemView.findViewById(R.id.tvDiscount);
             btnRemove = itemView.findViewById(R.id.btnRemove);
             btnUse = itemView.findViewById(R.id.btnUsePromo);
+            btnEdit = itemView.findViewById(R.id.btnEditPromo);
             tvEndDay = itemView.findViewById(R.id.tvEndDay);
         }
     }

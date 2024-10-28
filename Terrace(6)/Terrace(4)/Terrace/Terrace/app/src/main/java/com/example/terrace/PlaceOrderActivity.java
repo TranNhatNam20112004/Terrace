@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.terrace.Adapter.CartAdapter;
 import com.example.terrace.Adapter.ProductAdapter;
 import com.example.terrace.Interface.icCartClick;
+import com.example.terrace.Interface.icUpdateCartClick;
 import com.example.terrace.View.LoginActivity;
 import com.example.terrace.View.MainActivity;
 import com.example.terrace.databinding.ActivityAddProductBinding;
@@ -98,6 +99,11 @@ public class PlaceOrderActivity extends AppCompatActivity {
         arr_Cart = new ArrayList<>();
         loadData();
         cartAdapter = new CartAdapter(this, arr_Cart, new icCartClick() {
+            @Override
+            public void onCartClick(cart cart) {
+
+            }
+        }, new icUpdateCartClick() {
             @Override
             public void onCartClick(cart cart) {
 

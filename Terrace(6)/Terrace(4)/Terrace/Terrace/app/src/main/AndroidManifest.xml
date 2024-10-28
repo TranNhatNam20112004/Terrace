@@ -40,6 +40,9 @@
             android:name=".View.CreatePromoActivity"
             android:exported="false" />
         <activity
+            android:name=".View.UpdatePromoActivity"
+            android:exported="false" />
+        <activity
             android:name=".PromoActivity"
             android:exported="false" />
         <activity

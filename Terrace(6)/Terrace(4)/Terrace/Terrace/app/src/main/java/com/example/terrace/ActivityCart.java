@@ -2,6 +2,7 @@ package com.example.terrace;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -13,11 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.terrace.Adapter.CartAdapter;
 import com.example.terrace.Interface.icCartClick;
+import com.example.terrace.Interface.icUpdateCartClick;
 import com.example.terrace.View.MainActivity;
 import com.example.terrace.model.cart;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ActivityCart extends AppCompatActivity {
 
@@ -26,45 +29,47 @@ public class ActivityCart extends AppCompatActivity {
     CartAdapter cartAdapter;
     TextView txtTotalPrice;
     float total = 0;
-    Button btnBack, btnCheckout;;
+    Button btnBack, btnCheckout;
+    String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_cart);
+
         Intent i = getIntent();
+        name = i.getStringExtra("name");
+
         arr_Cart = new ArrayList<>();
-        loadData();
+
         rvCart = findViewById(R.id.rvCart);
-        btnBack = findViewById(R.id.btn_back3); // Ánh xạ nút Back
+        btnBack = findViewById(R.id.btn_back3);
+        btnCheckout = findViewById(R.id.btnCheckout);
+        txtTotalPrice = findViewById(R.id.txtTotalPrice);
 
         cartAdapter = new CartAdapter(this, arr_Cart, new icCartClick() {
             @Override
             public void onCartClick(cart cart) {
-               deleteCart(cart.getId());
+                deleteCart(cart.getId());
             }
-        });
-        rvCart.setAdapter(cartAdapter);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-        rvCart.setLayoutManager(staggeredGridLayoutManager);
-
-        txtTotalPrice = findViewById(R.id.txtTotalPrice);
-        txtTotalPrice.setText(String.valueOf(total));
-
-        // Xử lý sự kiện khi nhấn nút Back
-        btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(ActivityCart.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        });
-        btnCheckout = findViewById(R.id.btnCheckout);
-        btnCheckout.setOnClickListener(new View.OnClickListener() {
+        }, new icUpdateCartClick() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ActivityCart.this, PlaceOrderActivity.class);
-                startActivity(intent);
+            public void onCartClick(cart cart) {
+                updateCart(cart);
             }
+        });
+
+        rvCart.setAdapter(cartAdapter);
+        rvCart.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+
+        loadData();
+
+        btnBack.setOnClickListener(v -> finish()); // Chỉ quay lại mà không tạo Intent mới
+
+        btnCheckout.setOnClickListener(v -> {
+            Intent intent = new Intent(ActivityCart.this, PlaceOrderActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -73,32 +78,61 @@ public class ActivityCart extends AppCompatActivity {
         db.collection("cart").document(cartId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(ActivityCart.this, "Sản phẩm đã được xoa khoi giỏ hàng", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityCart.this, "Sản phẩm đã được xóa khỏi giỏ hàng", Toast.LENGTH_SHORT).show();
                     loadData();  // Tải lại dữ liệu sau khi xóa
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(ActivityCart.this, "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityCart.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
 
     private void loadData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("cart")
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) {
+                        Toast.makeText(ActivityCart.this, "Lỗi khi tải giỏ hàng", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     arr_Cart.clear();
-                    total = 0;  // Reset total to 0
+                    total = 0;
                     for (QueryDocumentSnapshot document : snapshots) {
                         cart cart = document.toObject(cart.class);
-                        arr_Cart.add(cart);
-                        total += cart.getPrice();  // Add cart item's price
+                        if(cart.getUser().equals(name)){
+                            arr_Cart.add(cart);
+                            total += cart.getPrice();
+                        }
                     }
                     cartAdapter.notifyDataSetChanged();
-                    txtTotalPrice.setText(String.valueOf(total));  // Update total price
+
+                    // Định dạng tổng giá với 2 chữ số thập phân
+                    String formattedTotal = String.format(Locale.getDefault(), "%.2f", total);
+                    txtTotalPrice.setText(formattedTotal);
                 });
     }
-
+    public void updateCart(cart cart) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        // Tìm kiếm sản phẩm theo tên và số bàn
+        db.collection("cart")
+                .whereEqualTo("name", cart.getName())
+                .whereEqualTo("user", name)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            db.collection("cart")
+                                    .document(document.getId())
+                                    .set(cart)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d("Firestore", "Product updated successfully!");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w("Firestore", "Error updating product", e);
+                                    });
+                        }
+                    } else {
+                        Log.w("Firestore", "Error getting documents: ", task.getException());
+                    }
+                });
+    }
 }
