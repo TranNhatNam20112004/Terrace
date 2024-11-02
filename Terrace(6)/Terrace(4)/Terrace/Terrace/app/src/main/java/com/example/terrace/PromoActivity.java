@@ -48,7 +48,7 @@ public class PromoActivity extends AppCompatActivity {
             @Override
             public void onClick(Promotion promo)
             {
-                //deletePromo(promo);
+                deletePromo(promo);
             }
         }, new icUsePromoClick() {
             @Override
