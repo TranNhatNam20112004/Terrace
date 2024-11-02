@@ -83,7 +83,6 @@ public class PromoActivity extends AppCompatActivity {
                 stopApplyingPromo();
             }
         });
-
         // Thêm sự kiện click cho btnBack
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override

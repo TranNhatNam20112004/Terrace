@@ -49,7 +49,6 @@ public class PromoAdapter extends RecyclerView.Adapter<PromoAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Promotion promo = arrPromo.get(position);
-
         // Thiết lập các giá trị cho view
         holder.tvName.setText(promo.getName());
         holder.tvDiscount.setText(String.valueOf(promo.getDiscount()));

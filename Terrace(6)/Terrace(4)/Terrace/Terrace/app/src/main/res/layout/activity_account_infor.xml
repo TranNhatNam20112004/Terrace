@@ -8,26 +8,32 @@
     android:background="@color/background"
     android:orientation="vertical"
     tools:context=".AccountInforActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="20dp">
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal">
+
         <Button
-            android:id="@+id/btn_backInfor"
+            android:id="@+id/btnBackInformation"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:background="@drawable/ic_arrow"
-            android:layout_margin="10dp"
             android:layout_gravity="center"
-            android:backgroundTint="@color/font_color"/>
+            android:layout_margin="10dp"
+            android:background="@drawable/ic_arrow"
+            android:backgroundTint="@color/font_color" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:text="Thông tin tài khoản"
-            android:textSize="24sp"
             android:textColor="@color/font_color"
-            android:layout_gravity="center"/>
+            android:textSize="24sp" />
         <!--<ImageButton
             android:id="@+id/btnLogout"
             android:layout_width="wrap_content"
@@ -38,11 +44,13 @@
             android:layout_gravity="center"
             android:background="@android:color/transparent"/>-->
     </LinearLayout>
+
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:layout_gravity="center"/>
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:src="@drawable/account" />
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

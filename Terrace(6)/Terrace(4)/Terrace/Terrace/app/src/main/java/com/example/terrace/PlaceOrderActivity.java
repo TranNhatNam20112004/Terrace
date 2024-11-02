@@ -56,6 +56,7 @@ public class PlaceOrderActivity extends AppCompatActivity {
     float total = 0;
     TextView txtTotalPrice;
     private FirebaseFirestore db;
+    private String name;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -71,6 +72,7 @@ public class PlaceOrderActivity extends AppCompatActivity {
         binding = ActivityPlaceOrderBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        name = getIntent().getStringExtra("name");
         addControls();
     }
 
@@ -92,7 +94,6 @@ public class PlaceOrderActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //openDialog(Gravity.CENTER);
                 placeOrder();
-
             }
         });
 
@@ -119,6 +120,7 @@ public class PlaceOrderActivity extends AppCompatActivity {
     private void loadData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("cart")
+                .whereEqualTo("user", name)
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) {
                         return;

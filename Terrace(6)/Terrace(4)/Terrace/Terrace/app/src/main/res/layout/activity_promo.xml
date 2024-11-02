@@ -60,7 +60,7 @@
             android:layout_height="69dp"
             android:layout_marginLeft="10dp"
             android:backgroundTint="@color/color1"
-            android:text="Ngưng CTKM"
+            android:text="Dừng CTKM"
             android:textSize="20dp" />
     </LinearLayout>
 </LinearLayout>

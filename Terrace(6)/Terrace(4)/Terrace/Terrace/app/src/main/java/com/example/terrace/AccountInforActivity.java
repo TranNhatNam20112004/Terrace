@@ -15,6 +15,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.terrace.View.MainActivity;
 import com.example.terrace.databinding.ActivityAccountInforBinding;
 import com.example.terrace.databinding.ActivityEditProductBinding;
 import com.example.terrace.model.Drinks;
@@ -50,7 +51,7 @@ public class AccountInforActivity extends AppCompatActivity {
         binding = ActivityAccountInforBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.btnBackInfor.setOnClickListener(new View.OnClickListener() {
+        binding.btnBackInformation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

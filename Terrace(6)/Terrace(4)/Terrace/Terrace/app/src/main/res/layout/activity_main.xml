@@ -110,14 +110,13 @@
         android:id="@+id/recyclerSanPham"
 
         android:layout_width="347dp"
-        android:layout_height="454dp"
+        android:layout_height="550dp"
         android:layout_marginTop="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Search"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/Search" />
 
     <SearchView
         android:id="@+id/Search"

@@ -81,10 +81,11 @@
             android:id="@+id/btnCheckout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tiến hành thanh toán"
-            android:textSize="16sp"
-            android:backgroundTint="@color/design_default_color_primary"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/color1"
+            android:text="Đặt Hàng"
             android:textColor="@android:color/white"
-            android:layout_marginTop="16dp" />
+            android:textSize="20sp"
+            android:textStyle="bold|italic" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
