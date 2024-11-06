@@ -15,7 +15,9 @@ import androidx.cardview.widget.CardView;
 
 import com.example.terrace.model.User;
 import com.example.terrace.R;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class RegeisterAvtivity extends AppCompatActivity {
@@ -101,15 +103,14 @@ public class RegeisterAvtivity extends AppCompatActivity {
     private void saveUserToFirestore(User user) {
         db.collection("user")
                 .add(user)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(this, "Register successful", Toast.LENGTH_SHORT).show();
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        documentReference.update("userId", documentReference.getId());
+                        Toast.makeText(RegeisterAvtivity.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
                         Intent i = new Intent(RegeisterAvtivity.this, MainActivity.class);
-                        i.putExtra("name", user.getAccount());
+                        i.putExtra("name", user.getUserId());
                         startActivity(i);
-                        finish();
-                    } else {
-                        Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {

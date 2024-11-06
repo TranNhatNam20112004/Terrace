@@ -30,7 +30,7 @@ public class ActivityCart extends AppCompatActivity {
     TextView txtTotalPrice;
     float total = 0;
     Button btnBack, btnCheckout;
-    String name;
+    String name="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,11 +66,11 @@ public class ActivityCart extends AppCompatActivity {
         loadData();
 
         btnBack.setOnClickListener(v -> finish()); // Chỉ quay lại mà không tạo Intent mới
-        /*btnCheckout.setOnClickListener(v -> {
+        btnCheckout.setOnClickListener(v -> {
             Intent intent = new Intent(ActivityCart.this, PlaceOrderActivity.class);
             intent.putExtra("name", name);
             startActivity(intent);
-        });*/
+        });
     }
 
     private void deleteCart(String cartId) {

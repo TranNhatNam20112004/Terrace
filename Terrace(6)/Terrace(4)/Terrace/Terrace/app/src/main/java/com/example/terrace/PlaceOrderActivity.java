@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -27,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.terrace.Adapter.CartAdapter;
+import com.example.terrace.Adapter.OrderSummaryAdapter;
 import com.example.terrace.Adapter.ProductAdapter;
 import com.example.terrace.Interface.icCartClick;
 import com.example.terrace.Interface.icUpdateCartClick;
@@ -36,13 +38,22 @@ import com.example.terrace.databinding.ActivityAddProductBinding;
 import com.example.terrace.databinding.ActivityAdminPageBinding;
 import com.example.terrace.databinding.ActivityPlaceOrderBinding;
 import com.example.terrace.model.Drinks;
+import com.example.terrace.model.User;
 import com.example.terrace.model.cart;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,9 +61,9 @@ import java.util.Map;
 
 public class PlaceOrderActivity extends AppCompatActivity {
     private ActivityPlaceOrderBinding binding;
-    private ArrayList<cart> arr_Cart;
-    private CartAdapter cartAdapter;
-    private RecyclerView rvCart;
+    private ArrayList<cart> arr_orderSum;
+    private OrderSummaryAdapter orderSumAdapter;
+    private RecyclerView rvOrderSum;
     float total = 0;
     TextView txtTotalPrice;
     private FirebaseFirestore db;
@@ -72,14 +83,17 @@ public class PlaceOrderActivity extends AppCompatActivity {
         binding = ActivityPlaceOrderBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        name = getIntent().getStringExtra("name");
+        Bundle b = getIntent().getExtras();
+        if (b != null){
+            name = b.getString("name");
+        }
         addControls();
     }
 
     private void addControls() {
-        rvCart = findViewById(R.id.rvCart);
+        rvOrderSum = findViewById(R.id.rvOrderSummary);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
-        rvCart.setLayoutManager(gridLayoutManager);
+        rvOrderSum.setLayoutManager(gridLayoutManager);
         db = FirebaseFirestore.getInstance();
 
         binding.btnbackOrder.setOnClickListener(new View.OnClickListener() {
@@ -92,52 +106,42 @@ public class PlaceOrderActivity extends AppCompatActivity {
         binding.btnOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //openDialog(Gravity.CENTER);
                 placeOrder();
             }
         });
 
-        arr_Cart = new ArrayList<>();
+        arr_orderSum = new ArrayList<>();
         loadData();
-        cartAdapter = new CartAdapter(this, arr_Cart, new icCartClick() {
-            @Override
-            public void onCartClick(cart cart) {
-
-            }
-        }, new icUpdateCartClick() {
-            @Override
-            public void onCartClick(cart cart) {
-
-            }
-        });
-        rvCart.setAdapter(cartAdapter);
+        orderSumAdapter = new OrderSummaryAdapter(this, arr_orderSum);
+        rvOrderSum.setAdapter(orderSumAdapter);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-        rvCart.setLayoutManager(staggeredGridLayoutManager);
+        rvOrderSum.setLayoutManager(staggeredGridLayoutManager);
         txtTotalPrice = findViewById(R.id.txtTotalPrice);
         txtTotalPrice.setText(String.valueOf(total));
     }
 
     private void loadData() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
         db.collection("cart")
                 .whereEqualTo("user", name)
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) {
                         return;
                     }
-                    arr_Cart.clear();
+                    arr_orderSum.clear();
                     total = 0;  // Reset total to 0
                     for (QueryDocumentSnapshot document : snapshots) {
                         cart cart = document.toObject(cart.class);
-                        arr_Cart.add(cart);
+                        arr_orderSum.add(cart);
                         total += cart.getPrice();  // Add cart item's price
                     }
-                    cartAdapter.notifyDataSetChanged();
+                    orderSumAdapter.notifyDataSetChanged();
                     txtTotalPrice.setText(String.valueOf(total));  // Update total price
                 });
     }
 
-    String userId ="";
+    String userId = "", drinkId = "";
+
     private void placeOrder() {
         // Lấy thông tin từ các EditText
         String nameNH = binding.edtTenNH.getText().toString().trim();
@@ -155,6 +159,19 @@ public class PlaceOrderActivity extends AppCompatActivity {
             Toast.makeText(this, "Số điện thoại không đúng định dạng", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        //lấy userId
+        db.collection("user").whereEqualTo("account", name)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@androidx.annotation.NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            DocumentSnapshot docSnap = task.getResult().getDocuments().get(0);
+                            User u = docSnap.toObject(User.class);
+                            userId = u.getUserId();
+                        }
+                    }
+                });
 
         // Lấy tổng tiền từ TextView
         String totalPrice = binding.txtTotalPrice.getText().toString().trim();
@@ -177,18 +194,75 @@ public class PlaceOrderActivity extends AppCompatActivity {
         order.put("address", addrNH);
         order.put("status", "Chưa giải quyết");
         order.put("totalamount", totalamount);
-        order.put("userId", "");
+        order.put("userId", userId);
         order.put("username", nameNH);
         order.put("orderNote", orderNote);
 
-
-        // Thêm tài liệu vào Firestore
+        // Thêm vào orders
         db.collection("orders").add(order)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        documentReference.update("orderId",documentReference.getId());
+                        documentReference.update("orderId", documentReference.getId());
                         Toast.makeText(PlaceOrderActivity.this, "Đặt hàng thành công", Toast.LENGTH_SHORT).show();
+
+                        //thêm vào orderdetail
+                        db.collection("cart")
+                                .whereEqualTo("user", name)
+                                .get()
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful() && task.getResult() != null) {
+                                        Map<String, Object> productList = new HashMap<>();
+                                        int count = 1;
+
+                                        for (DocumentSnapshot docSnap : task.getResult()) {
+                                            String nameC = docSnap.getString("name");
+                                            int quantityC = docSnap.getLong("quantity").intValue();
+                                            float priceC = docSnap.getLong("price").floatValue();
+
+                                            // Tạo một bản đồ con cho từng sản phẩm
+                                            Map<String, Object> productDetails = new HashMap<>();
+                                            productDetails.put("dname", nameC);
+                                            productDetails.put("quantity", quantityC);
+                                            productDetails.put("price", priceC);
+
+                                            // Thêm bản đồ con vào danh sách sản phẩm với khóa duy nhất (ví dụ: SP1, SP2)
+                                            productList.put("Pro" + count, productDetails);
+                                            count++;
+                                        }
+
+                                        // Thêm chi tiết đơn hàng vào collection orderdetail
+                                        Map<String, Object> orderDetail = new HashMap<>();
+                                        orderDetail.put("orderId", documentReference.getId()); // ID đơn hàng
+                                        orderDetail.put("ProductList", productList); // Danh sách sản phẩm
+
+                                        db.collection("orderdetail").add(orderDetail)
+                                                .addOnSuccessListener(docRefOT -> {
+                                                    // Cập nhật ID cho orderdetail
+                                                    docRefOT.update("id", docRefOT.getId())
+                                                            .addOnSuccessListener(aVoid -> Log.d("Success", "Đã thêm chi tiết đơn hàng thành công"))
+                                                            .addOnFailureListener(e -> Log.d("Error", "Cập nhật ID thất bại: " + e.getMessage()));
+                                                })
+                                                .addOnFailureListener(e -> Log.d("Error", "Thêm chi tiết đơn hàng thất bại: " + e.getMessage()));
+                                    } else {
+                                        Log.d("Error", "Không tìm thấy sản phẩm trong giỏ hàng hoặc lỗi: " + task.getException());
+                                    }
+                                });
+
+                        // Xóa sản phẩm trong giỏ hàng
+                        db.collection("cart").whereEqualTo("user", name)
+                                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@androidx.annotation.NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                document.getReference().delete();
+                                            }
+                                        }
+                                    }
+                                });
+                        Intent intent = new Intent(PlaceOrderActivity.this, MainActivity.class);
+                        startActivity(intent);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -197,39 +271,5 @@ public class PlaceOrderActivity extends AppCompatActivity {
                         Toast.makeText(PlaceOrderActivity.this, "Đặt hàng thất bại" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-        Intent intent = new Intent(PlaceOrderActivity.this, MainActivity.class);
-        startActivity(intent);
     }
-
-        /*private void openDialog(int gravity){
-            final Dialog dialog = new Dialog(this);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setContentView(R.layout.dialog_order);
-
-            Window window = dialog.getWindow();
-            if (window == null){
-                return;
-            }
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-            //Xác định vị tri dialog
-            WindowManager.LayoutParams windowAttributes = window.getAttributes();
-            windowAttributes.gravity = gravity;
-            window.setAttributes(windowAttributes);
-
-            if (Gravity.BOTTOM == gravity){
-                dialog.setCancelable(true);
-            }else dialog.setCancelable(false);
-
-            Button btn_backHome = findViewById(R.id.btn_backHome);
-            btn_backHome.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(PlaceOrderActivity.this, MainActivity.class);
-                    startActivity(i);
-                }
-            });
-            dialog.show();
-        }*/
 }

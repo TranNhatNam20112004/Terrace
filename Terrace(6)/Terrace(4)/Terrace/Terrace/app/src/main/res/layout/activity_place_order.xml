@@ -137,11 +137,11 @@
                         android:textStyle="bold"
                         android:textColor="@color/font_color"/>
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvCart"
+                        android:id="@+id/rvOrderSummary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
-                        tools:listitem="@layout/cart_item"/>
+                        tools:listitem="@layout/ordersummary_item"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
             <androidx.cardview.widget.CardView

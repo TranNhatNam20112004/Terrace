@@ -7,30 +7,42 @@
     tools:context=".ActivityCart">
 
     <!-- RecyclerView để hiển thị danh sách sản phẩm -->
-
-    <Button
-        android:id="@+id/btn_back3"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/ic_arrow"
-        android:backgroundTint="@color/font_color"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.041"
-        app:layout_constraintStart_toStartOf="parent"
+    <LinearLayout
+        android:id="@+id/Linear1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="25dp"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteY="44dp" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+        <Button
+            android:id="@+id/btn_back3"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_arrow"
+            android:backgroundTint="@color/font_color" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="20dp"
+            android:text="Giỏ hàng"
+            android:textSize="25sp"
+            android:textColor="@color/font_color"/>
+    </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCart"
         android:layout_width="380dp"
         android:layout_height="513dp"
         android:layout_margin="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/cartSummary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_back3" />
+        app:layout_constraintTop_toBottomOf="@+id/Linear1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
 
     <!-- Phần tổng kết giỏ hàng -->
     <LinearLayout
@@ -40,8 +52,8 @@
         android:orientation="vertical"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
         <!-- TextView để hiển thị tổng tiền -->
         <LinearLayout

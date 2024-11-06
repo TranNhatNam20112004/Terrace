@@ -2,7 +2,7 @@ package com.example.terrace.model;
 
 public class User {
 
-   private String account, pass, mail, role,phone;
+   private String account, pass, mail, role,phone, userId;
 
     public User() {
     }
@@ -13,6 +13,7 @@ public class User {
         this.mail = mail;
         this.role = role;
         this.phone = phone;
+        this.userId = userId;
     }
 
     public String getPhone() {
@@ -53,5 +54,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

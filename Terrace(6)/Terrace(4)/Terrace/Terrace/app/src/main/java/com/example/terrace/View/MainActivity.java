@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txtName;
     SearchView searchView; // Khai báo SearchView
     float totalPrice = 0; // Giá trị tổng cho giỏ hàng
-    String name;
+    String name="";
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
