@@ -72,12 +72,17 @@ public class CreatePromoActivity extends AppCompatActivity {
                     int discount = Integer.parseInt(edtDiscount.getText().toString());
                     int quantity = Integer.parseInt(edtQuantity.getText().toString());
 
-                    // Kiểm tra % giảm giá không vượt quá 100
-                    if (discount > 100) {
-                        Toast.makeText(CreatePromoActivity.this, "Giá trị giảm giá không được vượt quá 100%", Toast.LENGTH_SHORT).show();
+                    // Kiểm tra % giảm giá nằm trong khoảng 0 đến 100
+                    if (discount < 0 || discount > 100) {
+                        Toast.makeText(CreatePromoActivity.this, "Giá trị giảm giá phải nằm trong khoảng từ 0% đến 100%", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
+                    // Kiểm tra số lượng nằm trong khoảng 1 đến 1000
+                    if (quantity < 1 || quantity > 1000) {
+                        Toast.makeText(CreatePromoActivity.this, "Số lượng phải nằm trong khoảng từ 1 đến 1000", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     // Chuyển đổi ngày tháng từ String sang Timestamp
                     Timestamp startDay = convertStringToTimestamp(edtStartDate.getText().toString());
                     Timestamp endDay = convertStringToTimestamp(edtEndDate.getText().toString());
@@ -99,7 +104,6 @@ public class CreatePromoActivity extends AppCompatActivity {
                 }
             }
         });
-
         btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

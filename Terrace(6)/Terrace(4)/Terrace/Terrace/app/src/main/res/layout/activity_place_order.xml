@@ -130,24 +130,27 @@
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp"
                 android:layout_margin="5dp">
+
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="361dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Tóm tắt đơn hàng"
+                        android:textColor="@color/font_color"
                         android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/font_color"/>
+                        android:textStyle="bold" />
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvOrderSummary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
-                        tools:listitem="@layout/ordersummary_item"/>
+                        tools:listitem="@layout/ordersummary_item" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

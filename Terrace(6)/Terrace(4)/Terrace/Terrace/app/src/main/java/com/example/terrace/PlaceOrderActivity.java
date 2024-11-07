@@ -129,8 +129,17 @@ public class PlaceOrderActivity extends AppCompatActivity {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String promoName = document.getString("name");
                             Float discount = document.getDouble("discount").floatValue();
-                            promoCodesList.add(promoName);
-                            promoCodeDiscountMap.put(promoName, discount);
+                            Timestamp start = document.getTimestamp("start");
+                            Timestamp end = document.getTimestamp("end");
+
+                            // Lấy thời gian hiện tại
+                            Timestamp now = Timestamp.now();
+
+                            // Kiểm tra nếu mã khuyến mãi nằm trong khoảng thời gian hợp lệ
+                            if (start != null && end != null && now.compareTo(start) >= 0 && now.compareTo(end) <= 0) {
+                                promoCodesList.add(promoName);
+                                promoCodeDiscountMap.put(promoName, discount);
+                            }
                         }
 
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, promoCodesList);
@@ -144,7 +153,6 @@ public class PlaceOrderActivity extends AppCompatActivity {
                     }
                 });
     }
-
     private void applyDiscount() {
         String selectedPromoCode = spinnerPromoCode.getSelectedItem() != null ? spinnerPromoCode.getSelectedItem().toString() : "";
         float discountPercentage = promoCodeDiscountMap.containsKey(selectedPromoCode) ? promoCodeDiscountMap.get(selectedPromoCode) : 0;
