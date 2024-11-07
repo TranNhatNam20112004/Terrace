@@ -29,13 +29,17 @@
             android:layout_margin="10dp"
             android:textColor="@color/font_color"/>
     </LinearLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <!-- Thông tin giao hàng -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -118,6 +122,8 @@
                         android:inputType="text"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <!-- Tóm tắt đơn hàng -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -144,6 +150,39 @@
                         tools:listitem="@layout/ordersummary_item"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <!-- Mã khuyến mãi -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                android:layout_margin="5dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Mã khuyến mãi"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/font_color"/>
+
+                    <!-- Spinner để chọn mã khuyến mãi -->
+                    <Spinner
+                        android:id="@+id/spinnerPromoCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@android:drawable/btn_dropdown"
+                        android:spinnerMode="dropdown" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Phương thức thanh toán -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -167,10 +206,10 @@
                         android:layout_height="wrap_content"
                         android:text="Thanh toán khi nhận hàng"
                         app:chipIcon="@drawable/ic_money"/>
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-            <!-- Phần tổng kết giỏ hàng -->
+
+            <!-- Tổng kết giỏ hàng -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -184,21 +223,16 @@
                     android:orientation="vertical"
                     android:padding="5dp">
 
-                    <!-- TextView để hiển thị tổng tiền -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="horizontal">
-
                         <TextView
-
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-
                             android:text="Tổng tiền"
                             android:textSize="18sp"
                             android:textStyle="bold" />
-
                         <TextView
                             android:id="@+id/txtTotalPrice"
                             android:layout_width="wrap_content"
@@ -208,7 +242,6 @@
                             android:textStyle="bold"
                             android:layout_marginLeft="8dp"/>
                         <TextView
-
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="VND"
@@ -229,9 +262,7 @@
                         android:layout_marginTop="16dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
         </LinearLayout>
     </ScrollView>
-
-
-
 </LinearLayout>

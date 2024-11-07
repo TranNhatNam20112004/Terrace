@@ -2,6 +2,8 @@ package com.example.terrace.model;
 
 import com.google.firebase.Timestamp;
 
+import java.util.Date;
+
 public class Promotion {
     private String id; // Thêm thuộc tính ID
     private String name;
@@ -14,9 +16,10 @@ public class Promotion {
         // Constructor mặc định
     }
 
-    public Promotion(String name, int discount, Timestamp end, int quantity) {
+    public Promotion(String name, int discount, Timestamp start, Timestamp end, int quantity) {
         this.name = name;
         this.discount = discount;
+        this.start = start;
         this.end = end;
         this.quantity = quantity;
     }
@@ -28,14 +31,6 @@ public class Promotion {
         this.start = start;
         this.end = end;
         this.quantity = quantity;
-    }
-
-    public Promotion(String name, int discount, Timestamp start, Timestamp end, int quantity) {
-        this.name = name;
-        this.discount = discount;
-        this.end = end;
-        this.quantity = quantity;
-        this.start = start;
     }
 
     // Getters và setters
@@ -86,4 +81,5 @@ public class Promotion {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
 }
