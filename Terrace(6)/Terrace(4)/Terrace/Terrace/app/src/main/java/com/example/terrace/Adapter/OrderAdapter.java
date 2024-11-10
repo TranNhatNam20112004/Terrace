@@ -3,13 +3,15 @@ package com.example.terrace.Adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.terrace.R;
 import com.example.terrace.model.Order;
-import com.google.api.Context;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -17,9 +19,14 @@ import java.util.Locale;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
     private List<Order> orderList;
+    private FirebaseFirestore db;
+    private boolean isAdmin;  // Thêm biến này để xác định trang admin hay user
 
-    public OrderAdapter(List<Order> orderList) {
+    // Sửa constructor để nhận tham số isAdmin
+    public OrderAdapter(List<Order> orderList, boolean isAdmin) {
         this.orderList = orderList;
+        this.db = FirebaseFirestore.getInstance();
+        this.isAdmin = isAdmin;  // Lưu giá trị isAdmin
     }
 
     @NonNull
@@ -43,6 +50,26 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.tvPhone.setText(order.getPhone());
         holder.tvPayMethod.setText(order.getPaymethod());
         holder.tvStatus.setText(order.getStatus());
+
+        // Nếu là admin, mới cho phép thay đổi trạng thái
+        if (isAdmin) {
+            holder.tvStatus.setOnClickListener(v -> {
+                PopupMenu popupMenu = new PopupMenu(v.getContext(), v);
+                popupMenu.getMenuInflater().inflate(R.menu.status_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    String newStatus = item.getTitle().toString();
+                    order.setStatus(newStatus);  // Cập nhật trạng thái trong model
+                    db.collection("orders").document(order.getOrderId()) // Cập nhật trạng thái trong Firestore
+                            .update("status", newStatus);
+                    holder.tvStatus.setText(newStatus);  // Cập nhật giao diện
+                    return true;
+                });
+                popupMenu.show();
+            });
+        } else {
+            // Nếu là user, không cho phép thay đổi trạng thái
+            holder.tvStatus.setClickable(false);  // Vô hiệu hóa click
+        }
     }
 
     @Override
@@ -51,7 +78,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     }
 
     public static class OrderViewHolder extends RecyclerView.ViewHolder {
-        TextView tvOrderId, tvUser, tvAddress, tvOrderDate, tvPhone, tvPayMethod, tvStatus;
+        TextView tvUser, tvAddress, tvOrderDate, tvPhone, tvPayMethod, tvStatus;
 
         public OrderViewHolder(@NonNull View itemView) {
             super(itemView);

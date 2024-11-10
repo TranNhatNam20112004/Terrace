@@ -13,44 +13,46 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.terrace.AccountInforActivity;
 import com.example.terrace.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class NewPassword extends AppCompatActivity {
 
     ImageButton btnBack;
-    EditText edtEmail, edtNewPass, edtReenter;
+    EditText edtPassCurrent, edtEmail, edtNewPass, edtReenter;
     Button btnConfirm;
-
+    String userId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_new_password);
 
-        // Find views
         btnBack = findViewById(R.id.btnBack);
-        edtEmail = findViewById(R.id.edtEmail);
+        edtPassCurrent = findViewById(R.id.edtPassCurrent);
         edtNewPass = findViewById(R.id.edtNewPass);
         edtReenter = findViewById(R.id.edtReenter);
         btnConfirm = findViewById(R.id.btnConfirm);
 
-        // Set click listener for btnBack
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        userId = auth.getCurrentUser().getUid();
+
         btnBack.setOnClickListener(view -> {
-            Intent intent = new Intent(NewPassword.this, LoginActivity.class);
+            Intent intent = new Intent(NewPassword.this, AccountInforActivity.class);
             startActivity(intent);
             finish();
         });
 
-        // Set click listener for btnConfirm
         btnConfirm.setOnClickListener(view -> {
-            String email = edtEmail.getText().toString().trim();
+            String currentPass = edtPassCurrent.getText().toString().trim();
             String newPass = edtNewPass.getText().toString().trim();
             String reenterPass = edtReenter.getText().toString().trim();
 
-            // Validate input
-            if (email.isEmpty()) {
-                edtEmail.setError("Vui lòng nhập email");
+            if (currentPass.isEmpty()) {
+                edtPassCurrent.setError("Vui lòng nhập mật khẩu hiện tại");
                 return;
             }
             if (newPass.isEmpty()) {
@@ -67,21 +69,16 @@ public class NewPassword extends AppCompatActivity {
                 return;
             }
 
-
-            // Update password in Firestore
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("user")
-                    .whereEqualTo("mail", email)
+            db.collection("user").document(userId)
                     .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                            String docId = task.getResult().getDocuments().get(0).getId();
-                            db.collection("user").document(docId)
+                    .addOnSuccessListener(documentSnapshot -> {
+                        String storedPass = documentSnapshot.getString("pass");
+                        if (storedPass != null && storedPass.equals(currentPass)) {
+                            db.collection("user").document(userId)
                                     .update("pass", newPass)
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(this, "Cập nhật mật khẩu thành công", Toast.LENGTH_SHORT).show();
-                                        // Quay lại LoginActivity sau khi cập nhật thành công
-                                        Intent intent = new Intent(NewPassword.this, LoginActivity.class);
+                                        Intent intent = new Intent(NewPassword.this, AccountInforActivity.class);
                                         startActivity(intent);
                                         finish();
                                     })
@@ -89,15 +86,14 @@ public class NewPassword extends AppCompatActivity {
                                         Toast.makeText(this, "Lỗi khi cập nhật mật khẩu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     });
                         } else {
-                            Toast.makeText(this, "Không tìm thấy tài khoản với email này", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Mật khẩu hiện tại không đúng", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Lỗi khi tìm kiếm tài khoản: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Lỗi khi truy xuất mật khẩu hiện tại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         });
 
-        // Handle window insets for edge-to-edge display
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

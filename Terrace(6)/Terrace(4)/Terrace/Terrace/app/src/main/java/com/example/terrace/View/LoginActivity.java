@@ -38,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         edtEmail = findViewById(R.id.edtEmail);
         edtPass = findViewById(R.id.edtPass);
-        btnForgot = findViewById(R.id.btnForgot); // Nút Forgot Password
 
         // Disable login button initially
         btnLog = findViewById(R.id.btnLogin);
@@ -71,11 +70,7 @@ public class LoginActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) { }
         });
 
-        // Sự kiện cho nút Forgot Password
-        btnForgot.setOnClickListener(view -> {
-            Intent intent = new Intent(LoginActivity.this, NewPassword.class);
-            startActivity(intent); // Chuyển qua ForgetPasswordActivity
-        });
+
 
         // Sự kiện cho nút Sign Up
         btnRes = findViewById(R.id.cardRes);
