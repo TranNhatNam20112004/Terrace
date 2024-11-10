@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="40dp"
-        android:text="SIGN IN"
+        android:text="ĐĂNG NHẬP"
         android:textColor="@color/black"
         android:textSize="30dp" />
 
@@ -49,7 +49,7 @@
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:ems="10"
-            android:hint="Email adress"
+            android:hint="Địa chỉ Email"
             android:inputType="text"
             android:paddingLeft="20dp" />
     </LinearLayout>
@@ -73,39 +73,21 @@
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:ems="10"
-            android:hint="Password"
+            android:hint="Mật Khẩu"
             android:inputType="textPassword"
             android:paddingLeft="20dp" />
     </LinearLayout>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/carForgotPass"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_marginLeft="50dp"
-        android:layout_marginTop="30dp"
-        app:cardBackgroundColor="#A4DC9A">
-
-        <Button
-            android:id="@+id/btnForgot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New password"
-            android:background="@android:color/transparent"
-            android:textColor="#324A59"
-            android:textSize="20dp" />
-    </androidx.cardview.widget.CardView>
 
     <Button
         android:id="@+id/btnLogin"
-        android:layout_width="150dp"
+        android:layout_width="170dp"
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:layout_marginTop="60dp"
         android:backgroundTint="@android:color/white"
         android:scaleType="fitXY"
-        android:text="Sign in"
+        android:text="Đăng Nhập"
         android:textColor="@color/black"
         android:textSize="22dp" />
 
@@ -120,7 +102,7 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New member? "
+            android:text="Thành viên mới ? "
             android:textSize="18dp" />
 
         <androidx.cardview.widget.CardView
@@ -132,7 +114,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="   Sign up"
+                android:text="Đăng Ký"
                 android:textColor="#324A59"
                 android:textSize="18dp" />
         </androidx.cardview.widget.CardView>

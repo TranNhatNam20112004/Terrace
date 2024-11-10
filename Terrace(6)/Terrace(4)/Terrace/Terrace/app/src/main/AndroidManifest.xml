@@ -15,9 +15,11 @@
         android:theme="@style/Theme.Terrace"
         tools:targetApi="31">
         <activity
-            android:name=".AccountInforActivity"
+            android:name=".View.OrderListUserActivity"
             android:exported="false" />
-        <!-- Các Activity khác -->
+        <activity
+            android:name=".AccountInforActivity"
+            android:exported="false" /> <!-- Các Activity khác -->
         <activity
             android:name=".View.NewPassword"
             android:exported="false" />

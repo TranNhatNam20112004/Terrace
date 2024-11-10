@@ -26,14 +26,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="40dp"
-        android:text="SIGN UP"
+        android:text="ĐĂNG KÍ"
         android:textColor="@color/black"
         android:textSize="30dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="32dp"
-        android:text="Create a new account"
+        android:text="Tạo tài khoản mới"
         android:textSize="18dp"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="60dp"
@@ -58,7 +58,7 @@
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:ems="10"
-            android:hint="Create a new account hear"
+            android:hint="Tên người dùng"
             android:inputType="text"
             android:paddingLeft="20dp"
             />
@@ -81,7 +81,7 @@
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:ems="10"
-            android:hint="Phone number"
+            android:hint="Số điện thoại"
             android:inputType="text"
             android:paddingLeft="20dp"
             />
@@ -105,7 +105,7 @@
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:ems="10"
-            android:hint="Email adress"
+            android:hint="Địa chỉ Email"
             android:inputType="text"
             android:paddingLeft="20dp"
             />
@@ -129,7 +129,7 @@
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:ems="10"
-            android:hint="Password"
+            android:hint="Mật khẩu"
             android:paddingLeft="20dp"
             android:inputType="textPassword"
             />
@@ -145,7 +145,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="By sign up you agree with our Teams of Use"
+            android:text="Đồng ý với các điều khoản"
             android:textColor="#324A59"
             android:textSize="15dp"/>
     </androidx.cardview.widget.CardView>
@@ -158,7 +158,7 @@
         android:layout_marginTop="60dp"
         android:backgroundTint="@android:color/white"
         android:scaleType="fitXY"
-        android:text="Sign up"
+        android:text="Đăng ký"
         android:textColor="@color/black"
         android:textSize="22dp" />
 
@@ -172,7 +172,7 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Already a member? "
+            android:text="Bạn là thành viên? "
             android:textSize="18dp"/>
         <androidx.cardview.widget.CardView
             android:id="@+id/cardLog"
@@ -182,7 +182,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="   Sign in"
+                android:text=" Đăng Nhập"
                 android:textColor="#324A59"
                 android:textSize="18dp"/>
         </androidx.cardview.widget.CardView>

@@ -1,6 +1,7 @@
 package com.example.terrace;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,7 +30,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import android.content.Intent;
 
 public class PlaceOrderActivity extends AppCompatActivity {
     private ActivityPlaceOrderBinding binding;
@@ -153,6 +153,7 @@ public class PlaceOrderActivity extends AppCompatActivity {
                     }
                 });
     }
+
     private void applyDiscount() {
         String selectedPromoCode = spinnerPromoCode.getSelectedItem() != null ? spinnerPromoCode.getSelectedItem().toString() : "";
         float discountPercentage = promoCodeDiscountMap.containsKey(selectedPromoCode) ? promoCodeDiscountMap.get(selectedPromoCode) : 0;
@@ -229,13 +230,13 @@ public class PlaceOrderActivity extends AppCompatActivity {
                         }
                         Toast.makeText(this, "Giỏ hàng đã được làm trống", Toast.LENGTH_SHORT).show();
 
-                        // Chuyển về trang chủ
+                        // Chuyển về trang chủ mà không đăng xuất người dùng
                         Intent intent = new Intent(this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(this, "Lỗi khi làm trống giỏ hàng", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Lỗi khi xóa giỏ hàng", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

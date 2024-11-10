@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/prepare"
+        android:title="Đang chuẩn bị"/>
+    <item android:id="@+id/shipping"
+        android:title="Đang giao"/>
+    <item android:id="@+id/delivered"
+        android:title="Đã giao thành công"/>
+</menu>
