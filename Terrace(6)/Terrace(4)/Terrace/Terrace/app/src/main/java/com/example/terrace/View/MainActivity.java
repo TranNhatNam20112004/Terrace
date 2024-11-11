@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
 
-    });
+        });
         recyclerViewSP.setAdapter(sanPhamAdapter);
         StaggeredGridLayoutManager staggeredGridLayoutManager =
                 new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
